@@ -1,0 +1,4 @@
+BUILD/DISCO_F469NI/GCC_ARM-DEBUG/BSP_DISCO_F469NI/Drivers/BSP/Components/otm8009a/otm8009a.o: \
+ BSP_DISCO_F469NI/Drivers/BSP/Components/otm8009a/otm8009a.c \
+ BUILD/DISCO_F469NI/GCC_ARM-DEBUG/mbed_config.h \
+ BSP_DISCO_F469NI/Drivers/BSP/Components/otm8009a/otm8009a.h
