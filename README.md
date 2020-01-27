@@ -2,7 +2,8 @@
 
 private repo for ECS dev board code w/ nanopb code included.
 
-to build project, download mbedcli binary from mbed and run the following command in the project directory:
+To build the project, run:
 
-mbed-cli compile -m DISCO_F469NI -t GCC_ARM
-
+sudo apt-get install protobuf-compiler
+pip3 install -r requirements.txt
+make
