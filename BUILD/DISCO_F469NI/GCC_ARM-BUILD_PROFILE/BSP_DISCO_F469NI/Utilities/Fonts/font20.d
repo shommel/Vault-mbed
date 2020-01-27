@@ -1,4 +1,0 @@
-BUILD/DISCO_F469NI/GCC_ARM-BUILD_PROFILE/BSP_DISCO_F469NI/Utilities/Fonts/font20.o: \
- BSP_DISCO_F469NI/Utilities/Fonts/font20.c \
- BUILD/DISCO_F469NI/GCC_ARM-BUILD_PROFILE/mbed_config.h \
- BSP_DISCO_F469NI/Utilities/Fonts/fonts.h
