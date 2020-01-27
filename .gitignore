@@ -1,1 +1,3 @@
 virtualenv
+*.pb.c
+*.pb.h
