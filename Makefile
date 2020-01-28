@@ -27,7 +27,7 @@ $(GIT_SUBMODULE_DEPS): .gitmodules
 	git submodule update
 
 $(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES)
-	mbed compile
+	mbed compile -m DISCO_F469NI -t GCC_ARM
 
 $(MBED_DEPS): $(MBED_DEPS_DOTLIBFILES)
 	mbed deploy
