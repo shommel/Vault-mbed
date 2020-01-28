@@ -32,16 +32,8 @@ $(GIT_SUBMODULE_DEPS) $(NANOPB_DEPS): .gitmodules
 	git submodule update
 	cd src/nanopb; ln -s $(addprefix ../../nanopb/, $(NANOPB_SOURCES)) .
 
-<<<<<<< HEAD
-$(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES)
-	mbed compile -m DISCO_F469NI -t GCC_ARM
-||||||| merged common ancestors
-$(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES)
-	mbed compile
-=======
 $(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES) $(NANOPB_DEPS)
 	mbed compile
->>>>>>> Restore missing soruces, rearrange directories
 
 $(MBED_DEPS): $(MBED_DEPS_DOTLIBFILES)
 	mbed deploy
