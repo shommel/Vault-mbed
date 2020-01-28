@@ -24,6 +24,7 @@ deps: $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES)
 default: $(GIT_SUBMODULE_DEPS) $(MBED_DEPS) $(TARGET)
 
 $(GIT_SUBMODULE_DEPS): .gitmodules
+	git submodule init
 	git submodule update
 
 $(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES)
