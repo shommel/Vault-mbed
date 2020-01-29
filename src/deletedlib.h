@@ -5,15 +5,23 @@
 #include "Bitcoin.h"
 #include "OpCodes.h"
 
+
+#include "helpers.h"
+
 // to use string class without std::
 using namespace std;
 
-Tx constructTx(long locktime, PublicKey active, PublicKey clawback, PrivateKey priv);
+PublicKey get_public_key();
+
+PrivateKey test_private_key();
+
+void generateKey();
+
+Tx constructTx();
 
 void deleteKey();
 
 void constructScript(long locktime, PublicKey active, PublicKey clawback);
-
 
 
 
