@@ -40,7 +40,7 @@ $(MBED_DEPS): $(MBED_DEPS_DOTLIBFILES)
 
 src/protobuf/%.pb.h src/protobuf/%.pb.c: src/%.proto virtualenv $(GIT_SUBMODULE_DEPS)
 	. virtualenv/bin/activate; \
-	cd src; protoc --plugin=protoc-gen-nanopb=../nanopb/generator/protoc-gen-nanopb --nanopb_out=protobuf $(notdir $<)
+	cd src; protoc --plugin=protoc-gen-nanopb=../nanopb/generator/protoc-gen-nanopb --nanopb_out=. $(notdir $<)
 
 clean:
 	rm -rf $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES) $(GIT_SUBMODULES)/* $(GIT_SUBMODULES)/.[a-z0-9]* __pycache__ BUILD virtualenv *.pyc src/nanopb/*
