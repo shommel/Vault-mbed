@@ -248,11 +248,15 @@ enum MessageType {
 
     // Vaults
     MessageType_DevBoardInitialize = 900 [(wire_in) = true];
-    MessageType_Vault = 901 [(wire_in) = true];
-    MessageType_Unvault = 902 [(wire_in) = true];
-    MessageType_CheckTotalBalance = 903 [(wire_in) = true];
-    MessageType_CheckVaultBalance = 904 [(wire_in) = true];
-    MessageType_CheckUnvaultBalance = 905 [(wire_in) = true];
+    MessageType_VaultRequest = 901 [(wire_in) = true];
+    MessageType_VaultResponse = 902 [(wire_in) = true];
+    MessageType_UnvaultRequest = 903 [(wire_in) = true];
+    MessageType_UnvaultResponse = 904 [(wire_in) = true];
+    MessageType_CheckTotalBalance = 910 [(wire_in) = true];
+    MessageType_CheckVaultBalance = 911 [(wire_in) = true];
+    MessageType_CheckUnvaultBalance = 912 [(wire_in) = true];
+    MessageType_SyncP2TSTs = 920 [(wire_in) = true]; // will sync p2tst storage from computer <-> dev board
+
 
 
 

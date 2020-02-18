@@ -136,6 +136,14 @@ message SignTx {
     optional uint32 branch_id = 10;                     // only for Zcash, BRANCH_ID when overwintered is set
 }
 
+message UnvaultRequest{
+    required string txid = 1;                           // txid of the hex to retrieve   
+}
+
+message UnvaultResponse{
+    required string hex = 1;                            //hex of the requested txid
+}
+
 /**
  * Response: Device asks for information for signing transaction or returns the last result
  * If request_index is set, device awaits TxAck message (with fields filled in according to request_type)
