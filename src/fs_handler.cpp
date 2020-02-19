@@ -1,9 +1,9 @@
-#include "fs-handler.h"
+#include "fs_handler.h"
+#include "main.h"
 
 BlockDevice *bd = BlockDevice::get_default_instance();
 LittleFileSystem fs("fs");
 struct dirent dir;
-
 
 void FSHandler::fs_init(){
 	fflush(stdout);

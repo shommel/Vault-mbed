@@ -1,7 +1,7 @@
-#include "msg-handler.h"
+#include "msg_handler.h"
+#include "main.h"
 
 Serial serial(USBTX, USBRX);
-FSHandler fs_handler = FSHandler();
 
 void TrezorMessageHandler::init(){
     //

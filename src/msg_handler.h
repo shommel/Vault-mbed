@@ -1,3 +1,6 @@
+#ifndef MSG_HANDLER_H
+#define MSG_HANDLER_H
+
 #include <string>
 #include <sstream>
 #include <stdint.h>
@@ -8,9 +11,6 @@
 
 // mbed headers
 #include "mbed.h"
-
-// File System handler header
-#include "fs-handler.h"
 
 // bitcoin/dev board headers
 #include "Bitcoin.h"
@@ -104,3 +104,5 @@ class TrezorMessageHandler {
 
         void check_unvault_bal_handler();
 };
+
+#endif

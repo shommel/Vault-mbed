@@ -1,9 +1,10 @@
+#ifndef FS_HANDLER_H
+#define FS_HANDLER_H 
+
 // mbed os headers
 #include "mbed.h"
 #include "BlockDevice.h"
 #include "LittleFileSystem.h"
-
-
 
 class FSHandler {
 	public:
@@ -15,3 +16,5 @@ class FSHandler {
 		int get_size(FILE *f);
 
 };
+
+#endif
