@@ -52,8 +52,6 @@ clean:
 
 test: $(NANOPB_DEPS)
 	echo $(GIT_SUBMODULE_DEPS)
-compile:
-	mbed compile -m DISCO_F469NI -t GCC_ARM
 
 install: $(TARGET)
 	DEVICE:=$(shell dmesg | grep -A 20 "STM32 STLink" | sed '/^--$$/q' | sed "s/^.*\[\(sd.\)\].*$$/\1/")

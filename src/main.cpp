@@ -1,13 +1,4 @@
-// mbed os headers
-#include "mbed.h"
-
-// bitcoin lib
-#include "Bitcoin.h"
-#include "helpers.h"
-#include "deletedlib.h"
-
-// handler librariers 
-#include "msg-handler.h"
+#include "main.h"
 
 /****************** GUI classes ****************/
 
@@ -19,6 +10,7 @@ Label lbl;
 
 /***************** Handler Classes ************ */
 TrezorMessageHandler msg_handler = TrezorMessageHandler(); //message handler for protobuf
+FSHandler fs_handler = FSHandler();
 
 /***************** callback functions ***********/
 
@@ -33,7 +25,6 @@ static lv_res_t serialReadCallback(lv_obj_t * btn);
 
 Tx txFinal;
 uint8_t result[64];    //just to show the serial I/O working, do not actually need right now
-Serial serial2(USBTX, USBRX);
 
 /******************* Main part *****************/
 int main(){
@@ -136,12 +127,9 @@ static lv_res_t constructTxCallback(lv_obj_t * btn){
     txFinal = constructTx();
     char file_name[128];
     sprintf(file_name, "%s%s%s", "fs/transactions/", txFinal.txid().c_str(), ".txt");
-    serial2.printf("%s\n", (char*)file_name);
-    //serial2.printf("%s\n", (char*)txFinal.toString().c_str());
-    // FILE *f = fopen(file_name, "w");
-    // fprintf(f, "%s", txFinal.toString().c_str());
-    // fflush(f);
-    // fclose(f);
+    //serial.printf("%s\n", (char*)file_name);
+    serial.printf("%s\n", (char*)txFinal.toString().c_str());
+
     showTxnScreen();
     return LV_RES_OK;
 }
