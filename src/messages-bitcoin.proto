@@ -136,14 +136,6 @@ message SignTx {
     optional uint32 branch_id = 10;                     // only for Zcash, BRANCH_ID when overwintered is set
 }
 
-message UnvaultRequest{
-    required string txid = 1;                           // txid of the hex to retrieve   
-}
-
-message UnvaultResponse{
-    required string hex = 1;                            //hex of the requested txid
-}
-
 /**
  * Response: Device asks for information for signing transaction or returns the last result
  * If request_index is set, device awaits TxAck message (with fields filled in according to request_type)
@@ -256,4 +248,70 @@ message TxAck {
             }
         }
     }
+}
+
+//Vault-Mbed protobuf messages
+
+message GetVaultAddress{
+    
+}
+
+message VaultAddress{
+    required string address = 1;
+}
+
+message GetVaultPubkey{
+    
+}
+
+message VaultPubkey{
+    required string key = 1;
+}
+
+message VaultRequest{
+    
+}
+
+message VaultResponse{
+    
+}
+
+message UnvaultRequest{
+    required string txid = 1;                           // txid of the hex to retrieve   
+}
+
+message UnvaultResponse{
+    required string hex = 1;                            //hex of the requested txid
+}
+
+message CheckTotalBalance{
+    
+}
+
+message TotalBalance{
+    required uint32 balance = 1;
+}
+
+message CheckVaultBalance{
+    
+}
+
+message VaultBalance{
+    required uint32 balance = 1;
+}
+
+message CheckUnvaultBalance{
+    
+}
+
+message UnvaultBalance{
+    required uint32 balance = 1;
+}
+
+message SyncP2TSTs{
+    
+}
+
+message SyncRes{
+    
 }

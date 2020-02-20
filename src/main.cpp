@@ -29,7 +29,7 @@ uint8_t result[64];    //just to show the serial I/O working, do not actually ne
 /******************* Main part *****************/
 int main(){
     init();
-    msg_handler.init();
+    fs_handler.init();
     showInitScreen();
 
     while(1){
@@ -128,7 +128,8 @@ static lv_res_t constructTxCallback(lv_obj_t * btn){
     char file_name[128];
     sprintf(file_name, "%s%s%s", "fs/transactions/", txFinal.txid().c_str(), ".txt");
     //serial.printf("%s\n", (char*)file_name);
-    serial.printf("%s\n", (char*)txFinal.toString().c_str());
+    //serial.printf("%s\n", (char*)txFinal.toString().c_str());
+    serial.printf("%s\n", cscript.type());
 
     showTxnScreen();
     return LV_RES_OK;

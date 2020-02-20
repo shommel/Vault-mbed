@@ -16,6 +16,7 @@
 extern Serial serial;
 extern FSHandler fs_handler;
 extern TrezorMessageHandler msg_handler;
+extern Script cscript;
 
 
 #endif

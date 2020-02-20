@@ -9,7 +9,7 @@
 class FSHandler {
 	public:
 
-		void fs_init();
+		void init();
 
 		FILE *read(char* path);
 		void spend_close(FILE *f);

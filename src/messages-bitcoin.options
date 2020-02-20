@@ -1,3 +1,4 @@
 hw.trezor.messages.bitcoin.UnvaultRequest.txid 					max_size:32
-
 hw.trezor.messages.bitcoin.UnvaultResponse.hex 					max_size:4000
+hw.trezor.messages.bitcoin.VaultAddress.address 				max_size:34
+hw.trezor.messages.bitcoin.VaultPubkey.key 						max_size:33

@@ -3,11 +3,6 @@
 
 Serial serial(USBTX, USBRX);
 
-void TrezorMessageHandler::init(){
-    //
-    fs_handler.fs_init();
-}
-
 int TrezorMessageHandler::send_data(uint8_t* buffer){
 
     serial.write(buffer, 64);
@@ -57,19 +52,19 @@ int TrezorMessageHandler::unpack_data(uint8_t buffer[64]) {
         switch(msgtype) {
 
             case hw_trezor_messages_MessageType_MessageType_DevBoardInitialize:
-                //initialize_handler(message);
+                initialize_handler();
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_GetPublicKey:
-                //get_pubkey_handler(message);
+                get_pubkey_handler();
                 break;
 
-            case hw_trezor_messages_MessageType_MessageType_GetAddress:
-                //get_address_handler(message);
+            case hw_trezor_messages_MessageType_MessageType_GetVaultAddress:
+                get_address_handler();
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_VaultRequest:
-                //vault_handler(message);
+                vault_handler();
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_UnvaultRequest:
@@ -77,11 +72,11 @@ int TrezorMessageHandler::unpack_data(uint8_t buffer[64]) {
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_CheckVaultBalance:
-                //check_vault_bal_handler(message);
+                check_vault_bal_handler();
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_CheckUnvaultBalance:
-                //check_unvault_bal_handler(message);
+                check_unvault_bal_handler();
                 break;
 
             //called on initialization. respond with type 17 (features)
@@ -106,11 +101,6 @@ void TrezorMessageHandler::initialize_handler(){
 
 }
 
-void TrezorMessageHandler::get_address_handler(){
-    //initialize active/clawback xpubs into deletedlib
-
-}
-
 void TrezorMessageHandler::get_features_handler(){
     
     hw_trezor_messages_management_GetFeatures req      = hw_trezor_messages_management_GetFeatures_init_default;
@@ -129,9 +119,44 @@ void TrezorMessageHandler::get_features_handler(){
 
 }
 
+void TrezorMessageHandler::get_address_handler(){
+
+    hw_trezor_messages_bitcoin_GetVaultAddress req      = hw_trezor_messages_bitcoin_GetVaultAddress_init_default;
+    hw_trezor_messages_bitcoin_VaultAddress res         = hw_trezor_messages_bitcoin_VaultAddress_init_default;
+
+    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
+    pb_decode(&stream_i, hw_trezor_messages_bitcoin_GetVaultAddress_fields, &req);
+
+    /* 
+    FIXME: Do address stuff
+    */
+
+    uint8_t response[sizeof(res)];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
+    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultAddress_fields, &res);
+    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultAddress);
+
+}
+
+
+
 void TrezorMessageHandler::get_pubkey_handler(){
-    //PublicKey k = get_public_key();
-    //pack_data(k.toString(), hw_trezor_messages_MessageType_MessageType_PublicKey);
+
+    hw_trezor_messages_bitcoin_GetVaultPubkey req      = hw_trezor_messages_bitcoin_GetVaultPubkey_init_default;
+    hw_trezor_messages_bitcoin_VaultPubkey res         = hw_trezor_messages_bitcoin_VaultPubkey_init_default;
+
+    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
+    pb_decode(&stream_i, hw_trezor_messages_management_GetVaultPubkey_fields, &req);
+
+    /*
+    FIXME: Do pubkey stuff
+    */
+
+    uint8_t response[sizeof(res)];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
+    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultPubkey_fields, &res);
+    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultPubkey);
+
 }
 
 void TrezorMessageHandler::vault_handler(){

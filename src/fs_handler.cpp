@@ -5,7 +5,7 @@ BlockDevice *bd = BlockDevice::get_default_instance();
 LittleFileSystem fs("fs");
 struct dirent dir;
 
-void FSHandler::fs_init(){
+void FSHandler::init(){
 	fflush(stdout);
     int err = fs.mount(bd);
     if(err){
