@@ -19,6 +19,16 @@ NANOPB_DEPS = $(addprefix src/nanopb/, $(NANOPB_SOURCES))
 # The file that make should build, in the end
 TARGET = BUILD/DISCO_F469NI/GCC_ARM/Vault-mbed.bin
 
+# Try to discover the device (linux only) for `make install`, using sudo
+SUDOCMD = sudo
+# Commands to mount as a user
+#DEVICE = $(shell dmesg | grep -A 20 "STM32 STLink" | sed '/^--$$/q' | sed -z "s/^.*\[\(sd[a-z]\)\].*/\/dev\/\1/")
+HAVEDEVICE = $(shell lsblk -o PATH,LABEL | grep DIS_F469NI)
+DEVICE = $(shell lsblk -o PATH,LABEL | grep DIS_F469NI | awk '{print $$1}')
+MOUNTCMD = gio mount -d
+UMOUNTCMD = gio mount -u
+MOUNTPOINT = /mnt # filled in by the output of `gio mount` if not using sudo, usually under /media/<username>/DIS_F469NI
+
 virtualenv:
 	virtualenv -p python3 virtualenv
 	. virtualenv/bin/activate; pip install -Ur requirements.txt
@@ -53,9 +63,25 @@ clean:
 test: $(NANOPB_DEPS)
 	echo $(GIT_SUBMODULE_DEPS)
 
-install: $(TARGET)
-	DEVICE:=$(shell dmesg | grep -A 20 "STM32 STLink" | sed '/^--$$/q' | sed "s/^.*\[\(sd.\)\].*$$/\1/")
-	@echo $(DEVICE)
+install: $(TARGET) $(DEVICE)
+	$(eval MOUNTPOINT=$(shell $(MOUNTCMD) $(DEVICE) | sed 's/Mounted \(.*\) at \(.*\)/\2/'))
+	@echo Mounting $(DEVICE) on $(MOUNTPOINT) and copying firmware...
+	@cp $(TARGET) $(MOUNTPOINT)
+	@sync $(MOUNTPOINT)
+	@$(UMOUNTCMD) $(MOUNTPOINT)
+	@echo ...done
 
-#| egrep -A 20 "^--$$"')
-#| sed "s/^.*\[\(sd.\)\].*$$/\1/"')
+sudoinstall: $(TARGET) $(SUDODEVICE)
+ifneq ("$(wildcard $(DEVICE) )", "")
+	@echo Mounting $(DEVICE) on $(MOUNTPOINT) and copying firmware...
+	@$(SUDOCMD) mount $(DEVICE) $(MOUNTPOINT)
+	@$(SUDOCMD) cp $(TARGET) $(MOUNTPOINT)
+	@$(SUDOCMD) sync $(MOUNTPOINT)
+	@$(SUDOCMD) umount $(DEVICE)
+	@echo ...done
+else
+	@echo Unable to find STM32 ST-LINK device connected via USB. Make sure the device is
+	@echo connected and the STLK jumper is shorted.  Output of \`lsusb\` follows:
+	@echo ---------
+	@lsusb
+endif
