@@ -124,13 +124,16 @@ static lv_res_t toInitMenuCallback(lv_obj_t * btn){
 }
 
 static lv_res_t constructTxCallback(lv_obj_t * btn){
-    txFinal = constructTx();
-    char file_name[128];
-    sprintf(file_name, "%s%s%s", "fs/transactions/", txFinal.txid().c_str(), ".txt");
-    //serial.printf("%s\n", (char*)file_name);
-    //serial.printf("%s\n", (char*)txFinal.toString().c_str());
-    serial.printf("%s\n", cscript.type());
+    
+    for (int i = 0; i < 25; i++)
+    {
+        // string addr = getAddress();
+        // serial.printf("%s\n", addr.c_str());
 
+        PublicKey pub = getPublicKey();
+        serial.printf("%s\n", pub.toString().c_str());
+    }
+    
     showTxnScreen();
     return LV_RES_OK;
 }

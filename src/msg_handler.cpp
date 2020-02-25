@@ -127,9 +127,8 @@ void TrezorMessageHandler::get_address_handler(){
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
     pb_decode(&stream_i, hw_trezor_messages_bitcoin_GetVaultAddress_fields, &req);
 
-    /* 
-    FIXME: Do address stuff
-    */
+    string address = getAddress();
+    strncpy(res.address, address.c_str(), sizeof(res.address));
 
     uint8_t response[sizeof(res)];
     pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
@@ -146,11 +145,10 @@ void TrezorMessageHandler::get_pubkey_handler(){
     hw_trezor_messages_bitcoin_VaultPubkey res         = hw_trezor_messages_bitcoin_VaultPubkey_init_default;
 
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
-    pb_decode(&stream_i, hw_trezor_messages_management_GetVaultPubkey_fields, &req);
+    pb_decode(&stream_i, hw_trezor_messages_bitcoin_GetVaultPubkey_fields, &req);
 
-    /*
-    FIXME: Do pubkey stuff
-    */
+    PublicKey pubkey = getPublicKey();
+    strncpy(res.key, pubkey.toString().c_str(), sizeof(res.key));
 
     uint8_t response[sizeof(res)];
     pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
@@ -160,9 +158,41 @@ void TrezorMessageHandler::get_pubkey_handler(){
 }
 
 void TrezorMessageHandler::vault_handler(){
-    //Tx txn = constructTx();
-    //pack_data(txn.toString(), hw_trezor_messages_MessageType_MessageType_Vault);
-    //print to screen
+    hw_trezor_messages_bitcoin_VaultRequest req          = hw_trezor_messages_bitcoin_VaultRequest_init_default;
+    hw_trezor_messages_bitcoin_VaultResponse res         = hw_trezor_messages_bitcoin_VaultResponse_init_default;
+
+    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
+    pb_decode(&stream_i, hw_trezor_messages_bitcoin_VaultRequest_fields, &req);
+
+    /* 
+    FIXME: Do vault stuff
+    */
+    //getting count of txids, vouts, and amounts (at max 15)
+    uint8_t count = (uint8_t)req.txid_count;
+    if(count < 15){
+        count = 15;
+    }
+
+    uint32_t value = 0;
+
+    Tx tx;
+    TxIn txin;
+
+    for (int i = 0; i < count; ++i){
+        txin = TxIn(req.txid[i], req.vout[i]);
+        value += req.amount[i];
+        tx.addInput(txin);
+    }
+
+    tx = constructTx(tx, value);
+
+    strncpy(res.hex, tx.toString().c_str(), sizeof(tx));
+
+    uint8_t response[sizeof(res)];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
+    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultRequest_fields, &res);
+    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultResponse);
+
 }
 
 void TrezorMessageHandler::unvault_handler(){

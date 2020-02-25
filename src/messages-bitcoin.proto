@@ -261,7 +261,7 @@ message VaultAddress{
 }
 
 message GetVaultPubkey{
-    
+
 }
 
 message VaultPubkey{
@@ -269,11 +269,13 @@ message VaultPubkey{
 }
 
 message VaultRequest{
-    
+    repeated string txid = 1;
+    repeated uint32 vout = 2;
+    repeated uint32 amount = 3;
 }
 
 message VaultResponse{
-    
+    required string hex = 1;
 }
 
 message UnvaultRequest{

@@ -11,13 +11,13 @@
 // to use string class without std::
 using namespace std;
 
-PublicKey get_public_key();
+string getAddress();
 
-PrivateKey test_private_key();
+PublicKey getPublicKey();
 
 void generateKey();
 
-Tx constructTx();
+Tx constructTx(Tx tx, uint32_t value);
 
 void deleteKey();
 
