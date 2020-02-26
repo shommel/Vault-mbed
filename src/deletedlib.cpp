@@ -15,13 +15,13 @@ long locktime       = 9;
         OP_ENDIF])
 */
 
+
+
 string getAddress(){
-	generateKey();
 	return delPriv.address();
 }
 
 PublicKey getPublicKey(){
-	generateKey();
 	return delPriv.publicKey();
 }
 
@@ -42,14 +42,3 @@ void deleteKey(){
     }
 	
 }
-
-Tx constructTx(Tx tx, uint32_t value){
-
-
-	return tx;
-}
-
-void constructScript(long locktime, PublicKey active, PublicKey clawback){
-
-}
-

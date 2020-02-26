@@ -252,30 +252,22 @@ message TxAck {
 
 //Vault-Mbed protobuf messages
 
-message GetVaultAddress{
-    
+message PrepareVault{
+    required string signThis = 1;
 }
 
-message VaultAddress{
+message PrepareVaultResponse{
     required string address = 1;
+    required string redeemScript = 2;
+    required string sig = 3;
 }
 
-message GetVaultPubkey{
-
+message FinalizeVault{
+    required string hex = 1;                            //the 
 }
 
-message VaultPubkey{
-    required string key = 1;
-}
-
-message VaultRequest{
-    repeated string txid = 1;
-    repeated uint32 vout = 2;
-    repeated uint32 amount = 3;
-}
-
-message VaultResponse{
-    required string hex = 1;
+message FinalizeVaultResponse{
+    required bool isDeleted = 1;                        //true if key is deleted
 }
 
 message UnvaultRequest{

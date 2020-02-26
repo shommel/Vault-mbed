@@ -90,13 +90,11 @@ class TrezorMessageHandler {
         //protobuf message handlers 
         void initialize_handler();
 
-        void get_address_handler();
+        void prepare_vault_handler();
+
+        void finalize_vault_handler();
         
         void get_features_handler();
-
-        void get_pubkey_handler();
-
-        void vault_handler();
 
         void unvault_handler();
 

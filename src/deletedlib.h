@@ -17,11 +17,7 @@ PublicKey getPublicKey();
 
 void generateKey();
 
-Tx constructTx(Tx tx, uint32_t value);
-
 void deleteKey();
-
-void constructScript(long locktime, PublicKey active, PublicKey clawback);
 
 
 

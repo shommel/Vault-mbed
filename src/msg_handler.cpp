@@ -55,16 +55,12 @@ int TrezorMessageHandler::unpack_data(uint8_t buffer[64]) {
                 initialize_handler();
                 break;
 
-            case hw_trezor_messages_MessageType_MessageType_GetPublicKey:
-                get_pubkey_handler();
+            case hw_trezor_messages_MessageType_MessageType_PrepareVault:
+                prepare_vault_handler();
                 break;
 
-            case hw_trezor_messages_MessageType_MessageType_GetVaultAddress:
-                get_address_handler();
-                break;
-
-            case hw_trezor_messages_MessageType_MessageType_VaultRequest:
-                vault_handler();
+            case hw_trezor_messages_MessageType_MessageType_FinalizeVault:
+                finalize_vault_handler();
                 break;
 
             case hw_trezor_messages_MessageType_MessageType_UnvaultRequest:
@@ -119,79 +115,18 @@ void TrezorMessageHandler::get_features_handler(){
 
 }
 
-void TrezorMessageHandler::get_address_handler(){
-
-    hw_trezor_messages_bitcoin_GetVaultAddress req      = hw_trezor_messages_bitcoin_GetVaultAddress_init_default;
-    hw_trezor_messages_bitcoin_VaultAddress res         = hw_trezor_messages_bitcoin_VaultAddress_init_default;
+void TrezorMessageHandler::prepare_vault_handler(){
+    hw_trezor_messages_bitcoin_PrepareVault req         = hw_trezor_messages_bitcoin_PrepareVault_init_default;
+    hw_trezor_messages_bitcoin_PrepareVaultResponse res = hw_trezor_messages_bitcoin_PrepareVaultResponse_init_default;
 
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
-    pb_decode(&stream_i, hw_trezor_messages_bitcoin_GetVaultAddress_fields, &req);
+    pb_decode(&stream_i, hw_trezor_messages_bitcoin_PrepareVault_fields, &req);
 
-    string address = getAddress();
-    strncpy(res.address, address.c_str(), sizeof(res.address));
-
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultAddress_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultAddress);
-
+    /* FIXME - add rest of vault preparation*/
 }
 
-
-
-void TrezorMessageHandler::get_pubkey_handler(){
-
-    hw_trezor_messages_bitcoin_GetVaultPubkey req      = hw_trezor_messages_bitcoin_GetVaultPubkey_init_default;
-    hw_trezor_messages_bitcoin_VaultPubkey res         = hw_trezor_messages_bitcoin_VaultPubkey_init_default;
-
-    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
-    pb_decode(&stream_i, hw_trezor_messages_bitcoin_GetVaultPubkey_fields, &req);
-
-    PublicKey pubkey = getPublicKey();
-    strncpy(res.key, pubkey.toString().c_str(), sizeof(res.key));
-
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultPubkey_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultPubkey);
-
-}
-
-void TrezorMessageHandler::vault_handler(){
-    hw_trezor_messages_bitcoin_VaultRequest req          = hw_trezor_messages_bitcoin_VaultRequest_init_default;
-    hw_trezor_messages_bitcoin_VaultResponse res         = hw_trezor_messages_bitcoin_VaultResponse_init_default;
-
-    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
-    pb_decode(&stream_i, hw_trezor_messages_bitcoin_VaultRequest_fields, &req);
-
-    /* 
-    FIXME: Do vault stuff
-    */
-    //getting count of txids, vouts, and amounts (at max 15)
-    uint8_t count = (uint8_t)req.txid_count;
-    if(count < 15){
-        count = 15;
-    }
-
-    uint32_t value = 0;
-
-    Tx tx;
-    TxIn txin;
-
-    for (int i = 0; i < count; ++i){
-        txin = TxIn(req.txid[i], req.vout[i]);
-        value += req.amount[i];
-        tx.addInput(txin);
-    }
-
-    tx = constructTx(tx, value);
-
-    strncpy(res.hex, tx.toString().c_str(), sizeof(tx));
-
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_VaultRequest_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_VaultResponse);
+void TrezorMessageHandler::finalize_vault_handler(){
+    /* FIXME - add vault finalization*/
 
 }
 

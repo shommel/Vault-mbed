@@ -249,13 +249,12 @@ enum MessageType {
     // Vaults
     MessageType_DevBoardInitialize = 900 [(wire_in) = true];
     MessageType_DevBoardInitializeRes = 901 [(wire_in) = true];
-    MessageType_GetVaultAddress = 902 [(wire_in) = true];
-    MessageType_VaultAddress = 903 [(wire_in) = true];
-    MessageType_GetVaultPubkey = 904 [(wire_in) = true];
-    MessageType_VaultPubkey = 905 [(wire_in) = true];
+    
 
-    MessageType_VaultRequest = 910 [(wire_in) = true];
-    MessageType_VaultResponse = 911 [(wire_in) = true];
+    MessageType_PrepareVault = 910 [(wire_in) = true];
+    MessageType_PrepareVaultResponse = 911 [(wire_in) = true];
+    MessageType_FinalizeVault = 912 [(wire_in) = true];
+    MessageType_FinalizeVaultResponse = 913 [(wire_in) = true];    
 
     MessageType_UnvaultRequest = 920 [(wire_in) = true];
     MessageType_UnvaultResponse = 921 [(wire_in) = true];
