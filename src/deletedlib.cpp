@@ -4,6 +4,7 @@ PrivateKey delPriv;
 PublicKey clawback  = PrivateKey("Kzq8w6kkEXkWQN8CJSScLQfpkFUsJ6TqHHGBy1E6197byGahhDMb").publicKey();
 PublicKey active    = PrivateKey("KzF2Wyvor6iyomL7svZTzf1RP7gNho8J3hmqAMg68HLiodhYFUmq").publicKey();
 long locktime       = 9;
+Script rscript;
 
 /*
 'rec_staging':  CScript([
@@ -23,6 +24,25 @@ string getAddress(){
 
 PublicKey getPublicKey(){
 	return delPriv.publicKey();
+}
+
+Script getScript(){
+    return delPriv.publicKey().script();
+}
+
+Signature signMessage(uint8_t buf[32]){
+    return delPriv.sign(buf);
+}
+
+Tx constructTx(char* buf){
+    Tx tx = Tx();
+    tx.fromString(buf);
+
+    for (size_t i = 0; i < tx.inputsNumber; i++){
+        tx.signInput(i, delPriv);
+    }
+
+    return tx;
 }
 
 void generateKey() { 

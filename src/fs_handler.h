@@ -10,7 +10,6 @@ class FSHandler {
 	public:
 
 		void init();
-
 		FILE *read(char* path);
 		void spend_close(FILE *f);
 		int get_size(FILE *f);

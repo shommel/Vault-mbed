@@ -122,13 +122,40 @@ void TrezorMessageHandler::prepare_vault_handler(){
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
     pb_decode(&stream_i, hw_trezor_messages_bitcoin_PrepareVault_fields, &req);
 
-    /* FIXME - add rest of vault preparation*/
+    generateKey();
+    string address = getAddress();
+    Script script = getScript();
+    Signature sig = signMessage((uint8_t*)req.signThis);
+
+    strncpy(res.address, address.c_str(), address.length());
+    strncpy(res.redeemScript, script.toString().c_str(), script.toString().length());
+    strncpy(res.sig, sig.toString().c_str(), sig.toString().length());
+
+    uint8_t response[sizeof(res)];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
+    pb_encode(&stream_o, hw_trezor_messages_bitcoin_PrepareVaultResponse_fields, &res);
+    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_PrepareVaultResponse);
+
 }
 
 void TrezorMessageHandler::finalize_vault_handler(){
-    /* FIXME - add vault finalization*/
+
+    hw_trezor_messages_bitcoin_FinalizeVault req         = hw_trezor_messages_bitcoin_FinalizeVault_init_default;
+    hw_trezor_messages_bitcoin_FinalizeVaultResponse res = hw_trezor_messages_bitcoin_FinalizeVaultResponse_init_default;
+
+    pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
+    pb_decode(&stream_i, hw_trezor_messages_bitcoin_FinalizeVault_fields, &req);
+
+    Tx tx = constructTx(req.hex);
+
+    
+
+
 
 }
+
+
+
 
 void TrezorMessageHandler::unvault_handler(){
     hw_trezor_messages_bitcoin_UnvaultRequest req         = hw_trezor_messages_bitcoin_UnvaultRequest_init_default;
