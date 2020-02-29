@@ -1,5 +1,8 @@
 
 .DEFAULT_GOAL := default
+# Source files
+PROTOFILES = messages-common.proto messages-bitcoin.proto messages-management.proto messages.proto
+SOURCES = deletedlib.cpp deletedlib.h msg_handler.cpp msg_handler.h helpers.cpp helpers.h fs_handler.cpp fs_handler.h main.h main.cpp
 
 # Dependencies
 MBED_DEPS = f469_lvgl_driver BSP_DISCO_F469NI lvgl-mbed mbed-os QSPI_DISCO_F469NI tiny_lvgl_gui uBitcoin
