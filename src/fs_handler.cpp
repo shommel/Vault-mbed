@@ -15,11 +15,17 @@ void FSHandler::init(){
     fs.mkdir("transactions", S_IRWXU);
 }
 
-FILE *FSHandler::read(char* txid){
+FILE *FSHandler::open(char* txid, int mode){
 	char file_name[64];
     sprintf(file_name, "%s%s%s", "fs/transactions/", txid, ".txt");
+    FILE *f;
+    if(mode == 0){
+        f = fopen(file_name, "r");
+    }
+    else{
+        f = fopen(file_name, "w");
 
-	FILE *f = fopen(file_name, "r");
+    }
 
 	if(f == NULL){
 		//error testing
@@ -29,10 +35,11 @@ FILE *FSHandler::read(char* txid){
 	return f;
 }
 
-void FSHandler::spend_close(FILE *f){
+void FSHandler::close(FILE *f){
 	//FIXME
 	//somehow mark the txn/file as spent
 	//fs.remove(file_name);
+    fflush(f);
     fclose(f);
 
 }

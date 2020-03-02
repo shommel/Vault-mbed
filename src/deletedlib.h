@@ -4,9 +4,8 @@
 // bitcoin lib
 #include "Bitcoin.h"
 #include "OpCodes.h"
-
-
 #include "helpers.h"
+#include "fs_handler.h"
 
 // to use string class without std::
 using namespace std;
@@ -23,6 +22,6 @@ void generateKey();
 
 void deleteKey();
 
-Tx constructTx(char* tx);
+string constructTx(char* tx);
 
 #endif

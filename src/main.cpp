@@ -41,7 +41,7 @@ int main(){
 void showInitScreen(){
 
     gui.clear();
-    titleLbl = Label("Welcome");
+    titleLbl = Label("Welcome to Vault-Mbed");
     titleLbl.size(gui.width(), 20);
     titleLbl.position(0, 40);
     titleLbl.alignText(ALIGN_TEXT_CENTER);
@@ -123,17 +123,7 @@ static lv_res_t toInitMenuCallback(lv_obj_t * btn){
     return LV_RES_OK;
 }
 
-static lv_res_t constructTxCallback(lv_obj_t * btn){
-    
-    for (int i = 0; i < 25; i++)
-    {
-        // string addr = getAddress();
-        // serial.printf("%s\n", addr.c_str());
-
-        PublicKey pub = getPublicKey();
-        serial.printf("%s\n", pub.toString().c_str());
-    }
-    
+static lv_res_t constructTxCallback(lv_obj_t * btn){    
     showTxnScreen();
     return LV_RES_OK;
 }

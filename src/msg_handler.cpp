@@ -146,16 +146,16 @@ void TrezorMessageHandler::finalize_vault_handler(){
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
     pb_decode(&stream_i, hw_trezor_messages_bitcoin_FinalizeVault_fields, &req);
 
-    Tx tx = constructTx(req.hex);
+    string s = constructTx(req.hex); //returning the txid
 
-    
+    strncpy(res.txid, s.c_str(), s.length());
+    res.isDeleted = true;
 
-
-
+    uint8_t response[sizeof(res)];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
+    pb_encode(&stream_o, hw_trezor_messages_bitcoin_FinalizeVaultResponse_fields, &res);
+    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_FinalizeVaultResponse);
 }
-
-
-
 
 void TrezorMessageHandler::unvault_handler(){
     hw_trezor_messages_bitcoin_UnvaultRequest req         = hw_trezor_messages_bitcoin_UnvaultRequest_init_default;
@@ -164,11 +164,11 @@ void TrezorMessageHandler::unvault_handler(){
     pb_istream_t stream_i = pb_istream_from_buffer(message, sizeof(message));
     pb_decode(&stream_i, hw_trezor_messages_bitcoin_UnvaultRequest_fields, &req);
 
-    FILE *f = fs_handler.read((char*)req.txid);
+    FILE *f = fs_handler.open((char*)req.txid, 0);
     int size = fs_handler.get_size(f);
 
     fgets(res.hex, size, f);
-    fs_handler.spend_close(f);
+    fs_handler.close(f);
 
     uint8_t response[sizeof(res)];
     pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
