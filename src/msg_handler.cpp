@@ -1,19 +1,54 @@
 #include "msg_handler.h"
-#include "main.h"
 
-Serial serial(USBTX, USBRX);
-
-int TrezorMessageHandler::send_data(uint8_t* buffer){
-
-    serial.write(buffer, 64);
-    return 0;
+TrezorMessageHandler::TrezorMessageHandler(FSHandler& fs)
+    : fs_handler(fs)
+{
+    serial.attach(callback(this, &TrezorMessageHandler::serialRxInterruptHandler), Serial::RxIrq);
 }
 
-int TrezorMessageHandler::recv_data(uint8_t* buffer){
-    serial.read(buffer, 64);
-    //return 1;
-    return unpack_data(buffer);
+void TrezorMessageHandler::serialRxInterruptHandler() {
+    led1 = !led1;
+    serial.putc(serial.getc());
+    // FIXME put into 64b buffer, set some flag so processEvents knows when it
+    // has a full message to process
+}
 
+void TrezorMessageHandler::processEvents() {
+    if(hid.read_nb(&recv_report)) {
+        led2 = !led2;
+        unpack_data(recv_report.data);
+        /*
+        memcpy(send_report.data, recv_report.data, recv_report.length);
+        send_report.data[0] = 'R';
+        send_report.data[1] = 'E';
+        send_report.data[2] = 'C';
+        send_report.data[3] = 'E';
+        send_report.data[4] = 'I';
+        send_report.data[5] = 'V';
+        send_report.data[6] = 'E';
+        send_report.data[7] = 'D';
+        send_report.length = recv_report.length;
+        hid.send_nb(&send_report);
+        */
+    }
+}
+
+int TrezorMessageHandler::send_data(void* buffer){
+    memcpy(send_report.data, buffer, 64);
+    hid.send_nb(&send_report);
+    //for(int i=0;i<64;i++)
+    //    serial.putc(buffer[i]);
+    //serial.write(buffer, 64);
+    led4 = !led4;
+    printf("Sent response:\n");
+    printf("hex: ");
+    for(int i=0;i<64;i++)
+        printf("%02x", send_report.data[i]);
+    printf("\nstr: ");
+    for(int i=0;i<64;i++)
+        printf("%c", send_report.data[i]);
+    printf("\n");
+    return 0;
 }
 
 //unpack data from computer in 64 byte protobuf chunks
@@ -41,7 +76,7 @@ int TrezorMessageHandler::unpack_data(uint8_t buffer[64]) {
         remainder -= min((uint32_t)63, remainder);
 
     } else {
-        // message error: header not recognized
+        printf("ERROR: USBHID message received with invalid header.\n");
     }
 
     if(remainder == 0) { // full message received
@@ -77,6 +112,7 @@ int TrezorMessageHandler::unpack_data(uint8_t buffer[64]) {
 
             //called on initialization. respond with type 17 (features)
             case hw_trezor_messages_MessageType_MessageType_GetFeatures:
+                printf("GetFeatures message received.\n");
                 get_features_handler();
                 break;
 
@@ -98,7 +134,7 @@ void TrezorMessageHandler::initialize_handler(){
 }
 
 void TrezorMessageHandler::get_features_handler(){
-    
+
     hw_trezor_messages_management_GetFeatures req      = hw_trezor_messages_management_GetFeatures_init_default;
     hw_trezor_messages_management_Features res         = hw_trezor_messages_management_Features_init_default;
 
@@ -108,11 +144,9 @@ void TrezorMessageHandler::get_features_handler(){
     strncpy(res.vendor, "STMicroElectronics", 19);
     res.has_vendor = true;
 
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_management_Features_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_Features);
-
+    pack_data(hw_trezor_messages_MessageType_MessageType_Features,
+              hw_trezor_messages_management_Features_fields,
+              &res);
 }
 
 void TrezorMessageHandler::prepare_vault_handler(){
@@ -131,11 +165,9 @@ void TrezorMessageHandler::prepare_vault_handler(){
     strncpy(res.redeemScript, script.toString().c_str(), script.toString().length());
     strncpy(res.sig, sig.toString().c_str(), sig.toString().length());
 
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_PrepareVaultResponse_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_PrepareVaultResponse);
-
+    pack_data(hw_trezor_messages_MessageType_MessageType_PrepareVaultResponse,
+              hw_trezor_messages_bitcoin_PrepareVaultResponse_fields,
+              &res);
 }
 
 void TrezorMessageHandler::finalize_vault_handler(){
@@ -151,10 +183,9 @@ void TrezorMessageHandler::finalize_vault_handler(){
     strncpy(res.txid, s.c_str(), s.length());
     res.isDeleted = true;
 
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_FinalizeVaultResponse_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_FinalizeVaultResponse);
+    pack_data(hw_trezor_messages_MessageType_MessageType_FinalizeVaultResponse,
+              hw_trezor_messages_bitcoin_FinalizeVaultResponse_fields,
+              &res);
 }
 
 void TrezorMessageHandler::unvault_handler(){
@@ -170,10 +201,9 @@ void TrezorMessageHandler::unvault_handler(){
     fgets(res.hex, size, f);
     fs_handler.close(f);
 
-    uint8_t response[sizeof(res)];
-    pb_ostream_t stream_o = pb_ostream_from_buffer(response, sizeof(response));
-    pb_encode(&stream_o, hw_trezor_messages_bitcoin_UnvaultResponse_fields, &res);
-    pack_data(&stream_o, hw_trezor_messages_MessageType_MessageType_UnvaultResponse);
+    pack_data(hw_trezor_messages_MessageType_MessageType_UnvaultResponse,
+              hw_trezor_messages_bitcoin_UnvaultResponse_fields,
+              &res);
 }
 
 void TrezorMessageHandler::check_vault_bal_handler(){
@@ -184,49 +214,41 @@ void TrezorMessageHandler::check_unvault_bal_handler(){
 
 }
 
-int TrezorMessageHandler::pack_data(pb_ostream_t *s, hw_trezor_messages_MessageType type){
-	//To come back to later
-	//pb_ostream has a field s->state that has the entirity of the message 
-		//from get_features_handler().
-	//Need to find a way to convert s->state into a buffer and iterate through
-		//its elements with the wile loop found in pack_data
-	//once done, also need to work on send_data function that will print 
-		//each of the 64 byte packets to the serial output
-	//Additionally, need to fix the little file system on board
-
-	//free(message); //we're done with this message, clearing it for next one
+int TrezorMessageHandler::pack_data(hw_trezor_messages_MessageType type, const pb_msgdesc_t *fields, const void* res){
+    int msgsize;
+    uint8_t* response;
     trezor_first_message m;
     trezor_subsequent_message t;
-    memset((void *)&m, '\0', 64); //dealing with padding if need be
 
-    //filling first_message packet with header, type, size, message
-    size_t msgsize = s->bytes_written;
-    strncpy(m.header, "?##", 3);
-    m.type = (uint16_t)type;
-    m.size = msgsize;
-    strncpy((char *)m.message, (char *)s->state, min((size_t)55, msgsize));
-    msgsize -= min((size_t)55, msgsize); //determines if there is more message to pack
+    // Create a pb_ostream_t with the encoded data in the buffer `response`
+    pb_get_encoded_size((size_t*)&msgsize, fields, res);
+    response = new uint8_t[msgsize];
+    pb_ostream_t stream_o = pb_ostream_from_buffer(response, msgsize);
+    pb_encode(&stream_o, fields, res);
 
-    uint8_t *buffer = (uint8_t*) malloc(sizeof(m));
-    memcpy(buffer, &m, sizeof(m));
-    send_data(buffer);
+    m.type = __builtin_bswap16(type);
+    m.size = __builtin_bswap32(msgsize);
+    memcpy(m.message, response, min(55, msgsize));
+    int msgremaining = msgsize - min(55, msgsize);
 
-    //will pack rest of the message into subsequent packets
-    while(msgsize > 0){
-        memset((void *)&t, '\0', 64);
-        t.header = '?';
+    send_data(&m);
+
+    // Pack rest of the message into subsequent packets
+    while(msgremaining > 0) {
+        //memset((void *)&t, '\0', 64);
+        //t.header = '?';
 
         //copying either 63 bytes, or the remainder of message into t.message
-        //strncpy((char*)t.message, s.substr(s.length() - msgsize, min((size_t)63, msgsize)).c_str(), min((size_t)63, msgsize));
-		strncpy((char *)t.message, (char *)(uint8_t *)((s->state)+(m.size - msgsize)), min((size_t)63, msgsize));
+        memcpy(t.message, response+(msgsize-msgremaining), min(63, msgremaining));
 
-        msgsize -= min((size_t)63, msgsize);
+        msgremaining -= min(63, msgremaining);
 
-        memcpy(buffer, &t, sizeof(t));
-        send_data(buffer);
+        //memcpy(buffer, &t, sizeof(t));
+        send_data(&t);
     }
 
-    free(buffer);
+    //free(buffer);
+    free(response);
 
     return 0;
 }

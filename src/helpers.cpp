@@ -1,23 +1,12 @@
 #include "helpers.h"
-#include "QSPI_DISCO_F469NI.h" // internal storage
-
-static RNG_HandleTypeDef rng;
+#include "hardware.h"
 
 // internal storage we will use to store mnemonic
-QSPI_DISCO_F469NI qspi;
 #define WRITE_READ_ADDR     ((uint32_t)0x0050)
 #define QSPI_BASE_ADDR      ((uint32_t)0x90000000)
 
 // magic constant to check if we saved the mnemonic already
 static const char magic[] = "mnemonic";
-
-GUI gui;
-
-void init(){
-    initRNG();
-    qspi.Init();
-    gui.init();
-}
 
 string loadMnemonic(){
     char buffer[300] = "";

@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := default
 # Source files
 PROTOFILES = messages-common.proto messages-bitcoin.proto messages-management.proto messages.proto
-SOURCES = deletedlib.cpp deletedlib.h msg_handler.cpp msg_handler.h helpers.cpp helpers.h fs_handler.cpp fs_handler.h main.h main.cpp
+SOURCES = deletedlib.cpp deletedlib.h msg_handler.cpp msg_handler.h helpers.cpp helpers.h fs_handler.cpp fs_handler.h interface.h interface.cpp hardware.h main.cpp
 
 # Dependencies
 MBED_DEPS = f469_lvgl_driver BSP_DISCO_F469NI lvgl-mbed mbed-os QSPI_DISCO_F469NI tiny_lvgl_gui uBitcoin
@@ -18,6 +18,7 @@ PROTOBUF_BASENAMES = $(basename $(PROTOFILES))
 PROTOBUF_TARGET_SOURCEFILES = $(addprefix src/protobuf/, $(addsuffix .pb.c, $(basename $(PROTOFILES))) $(addsuffix .pb.h, $(basename $(PROTOFILES))))
 GIT_SUBMODULE_DEPS = $(addsuffix /.git, $(GIT_SUBMODULES))
 NANOPB_DEPS = $(addprefix src/nanopb/, $(NANOPB_SOURCES))
+SOURCES_DEPS = $(addprefix src/, $(SOURCES))
 
 # The file that make should build, in the end
 TARGET = BUILD/DISCO_F469NI/GCC_ARM/Vault-mbed.bin
@@ -45,7 +46,7 @@ $(GIT_SUBMODULE_DEPS) $(NANOPB_DEPS): .gitmodules
 	git submodule update
 	cd src/nanopb; ln -s $(addprefix ../../nanopb/, $(NANOPB_SOURCES)) .
 
-$(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES) $(NANOPB_DEPS)
+$(TARGET): $(MBED_DEPS) $(PROTOBUF_TARGET_SOURCEFILES) $(NANOPB_DEPS) $(SOURCES_DEPS)
 	mbed compile
 
 # The pipe symbol here causes this recipe to be executed exactly ONCE

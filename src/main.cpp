@@ -1,152 +1,64 @@
-#include "main.h"
+#include "hardware.h"
+#include "USBPhyHw.h"
+#include "usb_phy_api.h"
 
-/****************** GUI classes ****************/
+// bitcoin lib
+#include "Bitcoin.h"
+#include "helpers.h"
+#include "deletedlib.h"
 
-Label titleLbl;
-Label dataLbl;
+// handler librariers
+#include "msg_handler.h"
+#include "fs_handler.h"
+#include "interface.h"
 
-Button btn;
-Label lbl;
+// define the following to disable the GUI
+#include <tft.h>
+#include <touchpad.h>
+//#define DISABLE_GUI // Define this to disable the GUI and enable USBHID
+#undef DISABLE_GUI    // Or undefine it to enable the GUI
 
-/***************** Handler Classes ************ */
-TrezorMessageHandler msg_handler = TrezorMessageHandler(); //message handler for protobuf
-FSHandler fs_handler = FSHandler();
-
-/***************** callback functions ***********/
-
-void showInitScreen();
-static lv_res_t constructTxCallback(lv_obj_t * btn);
-static lv_res_t toInitMenuCallback(lv_obj_t * btn);
-static lv_res_t showSerialCallback(lv_obj_t * btn);
-static lv_res_t serialWriteCallback(lv_obj_t * btn);
-static lv_res_t serialReadCallback(lv_obj_t * btn);
-
-/************ bitcoin keys/locktimes ***********/
-
-Tx txFinal;
-uint8_t result[64];    //just to show the serial I/O working, do not actually need right now
+/******** Hardware interface globals ***********/
+GUI gui;                                    // LVGL gui
+RawSerial serial(USBTX, USBRX);             // Serial (debug)
+RNG_HandleTypeDef rng;                      // Hardware RNG
+QSPI_DISCO_F469NI qspi;                     // Internal mnemonic storage
+USBHID hid(true, 64, 64, 0x534c, 0x0001);   // trezor USB HID
+DigitalOut led1(LED1);                      // LED 1 (leftmost)
+DigitalOut led2(LED2);                      // LED 2
+DigitalOut led3(LED3);                      // LED 3
+DigitalOut led4(LED4);                      // LED 4 (rightmost)
 
 /******************* Main part *****************/
 int main(){
-    init();
-    fs_handler.init();
+    printf("main()\n");
+    FSHandler            fs_handler;
+    TrezorMessageHandler msg_handler = TrezorMessageHandler(fs_handler); //message handler for protobuf
+
+    if(!hid.configured()) {
+        printf("HID is unconfigured?!?!\n");
+    }
+    if(!hid.ready()) {
+        printf("HID is not ready?!?!\n");
+    }
+
+#ifndef DISABLE_GUI
+    gui.init();
     showInitScreen();
+    printf("gui init done\n");
+#else
+    printf("gui is disabled\n");
+#endif
+    initRNG();
+    qspi.Init();
 
     while(1){
+#ifndef DISABLE_GUI
         gui.update();
+#endif
+        msg_handler.processEvents();
+        wait_us(100000);
+        led3 = !led3;
     }
 }
 
-//initial screen on dev board start up
-void showInitScreen(){
-
-    gui.clear();
-    titleLbl = Label("Welcome to Vault-Mbed");
-    titleLbl.size(gui.width(), 20);
-    titleLbl.position(0, 40);
-    titleLbl.alignText(ALIGN_TEXT_CENTER);
-
-    //serial communication part for testing
-    Button btn(showSerialCallback, "Serial Port");
-    btn.size(gui.width()-100, 80);
-    btn.position(0, 100);
-    btn.align(ALIGN_CENTER);
-
-    //construct p2tst
-    Button btn2(constructTxCallback, "Construct P2TST");
-    btn2.size(gui.width()-100, 80);
-    btn2.position(0, 300);
-    btn2.align(ALIGN_CENTER);
-}
-
-//display transaction hex on screen (for testing purposes)
-void showTxnScreen(){
-    gui.clear();
-
-    titleLbl = Label("Raw P2TST Bitcoin Transaction Hex");
-    titleLbl.size(gui.width(), 20);
-    titleLbl.position(0, 40);
-    titleLbl.alignText(ALIGN_TEXT_CENTER);
-
-    Button btn(toInitMenuCallback, "OK");
-    btn.size(gui.width()-100, 80);
-    btn.position(0, gui.height()-100);
-    btn.align(ALIGN_CENTER);
-
-    titleLbl = Label(txFinal.toString().c_str());
-    titleLbl.size(gui.width(), 20);
-    titleLbl.position(0, 200);
-    titleLbl.alignText(ALIGN_TEXT_CENTER);
-}
-
-//serial I/O testing screen
-void showRead() {
-    gui.clear();
-    titleLbl = Label("Serial Port Communication");
-    titleLbl.size(gui.width(), 20);
-    titleLbl.position(0, 40);
-    titleLbl.alignText(ALIGN_TEXT_CENTER);
-
-    char hexout[129];
-    
-    hexout[128] = '\0';
-    for(int i=0;i<64;i++) {
-        sprintf(&(hexout[2*i]), "%02x", result[i]);
-    }
-    
-    //sprintf(hexout, "msgtype=%d msglen=%ld", msg_handler.msgtype, msg_handler.msglen);
-    dataLbl = Label(string("[") + hexout + string("]"));
-    dataLbl.size(gui.width()-100, 100);
-    dataLbl.position(50, 100);
-    dataLbl.alignText(ALIGN_TEXT_CENTER);
-
-    Button btn2(serialWriteCallback, "Write to Serial Port");
-    btn2.size(gui.width()-100, 80);
-    btn2.position(0, gui.height()-300);
-    btn2.align(ALIGN_CENTER);
-
-    Button btn3(serialReadCallback, "Read from Serial Port");
-    btn3.size(gui.width()-100, 80);
-    btn3.position(0, gui.height()-200);
-    btn3.align(ALIGN_CENTER);
-
-    Button btn(toInitMenuCallback, "OK");
-    btn.size(gui.width()-100, 80);
-    btn.position(0, gui.height()-100);
-    btn.align(ALIGN_CENTER);
-}
-
-/****************** Callback Functions **************/
-
-static lv_res_t toInitMenuCallback(lv_obj_t * btn){
-    showInitScreen();
-    return LV_RES_OK;
-}
-
-static lv_res_t constructTxCallback(lv_obj_t * btn){    
-    showTxnScreen();
-    return LV_RES_OK;
-}
-
-static lv_res_t showSerialCallback(lv_obj_t * btn){
-    showRead();
-    return LV_RES_OK;
-}
-
-static lv_res_t serialWriteCallback(lv_obj_t * btn){
-    //FIXME
-    return LV_RES_OK;
-}
-
-static lv_res_t serialReadCallback(lv_obj_t * btn){
-
-    // while( (res = handler.recv_data()) != 0 ){
-    //     //keep reading
-    // }
-    //FIXME
-    msg_handler.recv_data(result);
-    gui.clear();
-    gui.update();
-    showRead();
-    return LV_RES_OK;
-}

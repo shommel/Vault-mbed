@@ -2,16 +2,11 @@
 #define __HELPER_H__
 
 #include "mbed.h"
-#include "gui.h"
 #include <string>
 #include <sstream>
 #include <stdint.h>
 // to use string class without std::
 using namespace std;
-
-extern GUI gui;
-
-void init();
 
 /*********** random number generator ***********/
 
