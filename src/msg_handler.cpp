@@ -17,28 +17,12 @@ void TrezorMessageHandler::processEvents() {
     if(hid.read_nb(&recv_report)) {
         led2 = !led2;
         unpack_data(recv_report.data);
-        /*
-        memcpy(send_report.data, recv_report.data, recv_report.length);
-        send_report.data[0] = 'R';
-        send_report.data[1] = 'E';
-        send_report.data[2] = 'C';
-        send_report.data[3] = 'E';
-        send_report.data[4] = 'I';
-        send_report.data[5] = 'V';
-        send_report.data[6] = 'E';
-        send_report.data[7] = 'D';
-        send_report.length = recv_report.length;
-        hid.send_nb(&send_report);
-        */
     }
 }
 
 int TrezorMessageHandler::send_data(void* buffer){
     memcpy(send_report.data, buffer, 64);
     hid.send_nb(&send_report);
-    //for(int i=0;i<64;i++)
-    //    serial.putc(buffer[i]);
-    //serial.write(buffer, 64);
     led4 = !led4;
     printf("Sent response:\n");
     printf("hex: ");
@@ -235,19 +219,12 @@ int TrezorMessageHandler::pack_data(hw_trezor_messages_MessageType type, const p
 
     // Pack rest of the message into subsequent packets
     while(msgremaining > 0) {
-        //memset((void *)&t, '\0', 64);
-        //t.header = '?';
-
         //copying either 63 bytes, or the remainder of message into t.message
         memcpy(t.message, response+(msgsize-msgremaining), min(63, msgremaining));
-
         msgremaining -= min(63, msgremaining);
-
-        //memcpy(buffer, &t, sizeof(t));
         send_data(&t);
     }
 
-    //free(buffer);
     free(response);
 
     return 0;
