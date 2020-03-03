@@ -249,3 +249,64 @@ message TxAck {
         }
     }
 }
+
+//Vault-Mbed protobuf messages
+
+message PrepareVault{
+    required string signThis = 1;
+}
+
+message PrepareVaultResponse{
+    required string address = 1;
+    required string redeemScript = 2;
+    required string sig = 3;
+}
+
+message FinalizeVault{
+    required string hex = 1;                            //the 
+}
+
+message FinalizeVaultResponse{
+    required bool isDeleted = 1;                        //true if key is deleted
+    required string txid = 2;
+}
+
+message UnvaultRequest{
+    required string txid = 1;                           // txid of the hex to retrieve   
+}
+
+message UnvaultResponse{
+    required string hex = 1;                            //hex of the requested txid
+}
+
+message CheckTotalBalance{
+    
+}
+
+message TotalBalance{
+    required uint32 balance = 1;
+}
+
+message CheckVaultBalance{
+    
+}
+
+message VaultBalance{
+    required uint32 balance = 1;
+}
+
+message CheckUnvaultBalance{
+    
+}
+
+message UnvaultBalance{
+    required uint32 balance = 1;
+}
+
+message SyncP2TSTs{
+    
+}
+
+message SyncRes{
+    
+}

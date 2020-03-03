@@ -248,11 +248,26 @@ enum MessageType {
 
     // Vaults
     MessageType_DevBoardInitialize = 900 [(wire_in) = true];
-    MessageType_Vault = 901 [(wire_in) = true];
-    MessageType_Unvault = 902 [(wire_in) = true];
-    MessageType_CheckTotalBalance = 903 [(wire_in) = true];
-    MessageType_CheckVaultBalance = 904 [(wire_in) = true];
-    MessageType_CheckUnvaultBalance = 905 [(wire_in) = true];
+    MessageType_DevBoardInitializeRes = 901 [(wire_in) = true];
+    
+
+    MessageType_PrepareVault = 910 [(wire_in) = true];
+    MessageType_PrepareVaultResponse = 911 [(wire_in) = true];
+    MessageType_FinalizeVault = 912 [(wire_in) = true];
+    MessageType_FinalizeVaultResponse = 913 [(wire_in) = true];    
+
+    MessageType_UnvaultRequest = 920 [(wire_in) = true];
+    MessageType_UnvaultResponse = 921 [(wire_in) = true];
+
+    MessageType_CheckTotalBalance = 950 [(wire_in) = true]; //total balance between vaulted and unvaulted funds
+    MessageType_TotalBalance = 951 [(wire_in) = true]; 
+    MessageType_CheckVaultBalance = 952 [(wire_in) = true]; //balance of vaulted funds
+    MessageType_VaultBalance = 953 [(wire_in) = true];
+    MessageType_CheckUnvaultBalance = 954 [(wire_in) = true]; //balance of unvaulted funds
+    MessageType_UnvaultBalance = 955 [(wire_in) = true];
+
+    MessageType_SyncP2TSTs = 990 [(wire_in) = true]; // will sync p2tst storage from computer -> dev board
+    MessageType_SyncRes = 991 [(wire_in) = true]; // will sync p2tst storage from computer -> dev board
 
 
 

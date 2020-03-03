@@ -4,25 +4,24 @@
 // bitcoin lib
 #include "Bitcoin.h"
 #include "OpCodes.h"
-
-
 #include "helpers.h"
+#include "fs_handler.h"
 
 // to use string class without std::
 using namespace std;
 
-PublicKey get_public_key();
+string getAddress();
 
-PrivateKey test_private_key();
+PublicKey getPublicKey();
+
+Script getScript();
+
+Signature signMessage(uint8_t buf[32]);
 
 void generateKey();
 
-Tx constructTx();
-
 void deleteKey();
 
-void constructScript(long locktime, PublicKey active, PublicKey clawback);
-
-
+string constructTx(char* tx);
 
 #endif
