@@ -1,12 +1,11 @@
 #include "fs_handler.h"
-#include "main.h"
 
 BlockDevice *bd = BlockDevice::get_default_instance();
 LittleFileSystem fs("fs");
 struct dirent dir;
 
-void FSHandler::init(){
-	fflush(stdout);
+FSHandler::FSHandler(){
+    fflush(stdout);
     int err = fs.mount(bd);
     if(err){
         fflush(stdout);
@@ -16,7 +15,7 @@ void FSHandler::init(){
 }
 
 FILE *FSHandler::open(char* txid, int mode){
-	char file_name[64];
+    char file_name[64];
     sprintf(file_name, "%s%s%s", "fs/transactions/", txid, ".txt");
     FILE *f;
     if(mode == 0){
@@ -27,35 +26,35 @@ FILE *FSHandler::open(char* txid, int mode){
 
     }
 
-	if(f == NULL){
-		//error testing
-		//return error
-	}
+    if(f == NULL){
+        //error testing
+        //return error
+    }
 
-	return f;
+    return f;
 }
 
 void FSHandler::close(FILE *f){
-	//FIXME
-	//somehow mark the txn/file as spent
-	//fs.remove(file_name);
+    //FIXME
+    //somehow mark the txn/file as spent
+    //fs.remove(file_name);
     fflush(f);
     fclose(f);
 
 }
 
 int FSHandler::get_size(FILE *f){
-	int size = 0;
-	fseek(f, 0L, SEEK_END);
-	size = ftell(f);
-	rewind(f);
+    int size = 0;
+    fseek(f, 0L, SEEK_END);
+    size = ftell(f);
+    rewind(f);
 
-	return size;
+    return size;
 }
 
 
 /*
-a way to clean up directory 
+a way to clean up directory
 DIR *d = opendir("fs/transactions");
 
     char file_name[128];
