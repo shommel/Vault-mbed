@@ -31,6 +31,9 @@ Signature signMessage(uint8_t buf[32]){
     return delPriv.sign(buf);
 }
 
+/* FIXME temporary global */
+extern FSHandler* fs_handler_ptr;
+
 string constructTx(char* buf){
     Tx tx = Tx();
     tx.fromString(buf);
@@ -39,11 +42,10 @@ string constructTx(char* buf){
         tx.signInput(i, delPriv);
     }
 
-    /*
-    FILE *f = fs_handler.open((char*)tx.txid().c_str(), 1);
+    FILE *f = fs_handler_ptr->open((char*)tx.txid().c_str(), 1);
     fprintf(f, "%s\n", tx.toString().c_str());
-    fs_handler.close(f);
-    */
+    fs_handler_ptr->close(f);
+
     deleteKey();
     return tx.txid();
 }

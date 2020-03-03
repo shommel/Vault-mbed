@@ -15,8 +15,8 @@
 // define the following to disable the GUI
 #include <tft.h>
 #include <touchpad.h>
-//#define DISABLE_GUI // Define this to disable the GUI and enable USBHID
-#undef DISABLE_GUI    // Or undefine it to enable the GUI
+#define DISABLE_GUI     // Define this to disable the GUI and enable USBHID
+//#undef DISABLE_GUI    // Or undefine it to enable the GUI and disable USBHID
 
 /******** Hardware interface globals ***********/
 GUI gui;                                    // LVGL gui
@@ -28,6 +28,9 @@ DigitalOut led1(LED1);                      // LED 1 (leftmost)
 DigitalOut led2(LED2);                      // LED 2
 DigitalOut led3(LED3);                      // LED 3
 DigitalOut led4(LED4);                      // LED 4 (rightmost)
+
+/** Temporary globals (FIXME needs refactor) ***/
+FSHandler*           fs_handler_ptr;
 
 /******************* Main part *****************/
 int main(){
