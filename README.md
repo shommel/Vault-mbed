@@ -26,38 +26,46 @@ Along with a suite of code for the secure generation/deletion of keys, the vault
 ### Custom Protobuf Messages
 As part of our design, we have implemented a set of custom Trezor Protobuf messages. The rough idea of these messages can be found below, but will likely be changed/expanded in the future.
 
-`message PrepareVault {
+```
+message PrepareVault {
     string signThis = 1;
-}`
+}
+```
+
 The first message in the vaulting process. The computer interface will send this message to the vault wallet to tell it to initiate the vaulting procedure. 
 
-`message PrepareVaultResponse {
+```message PrepareVaultResponse {
     string address = 1;
     string redeemScript = 2;
     string sig(signThis) = 3;
-}`
+}
+```
 After receiving the `PrepareVault` message, the vault wallet will generate a private key and its corresponding redeemScript for the upcoming transaction. Additionally, the vault wallet will sign `signThis` and return its signature for the possibility of authenticated messages. 
 
-`message FinalizeVault {
+```message FinalizeVault {
     string hex = 1;
-}`
+}
+```
 After the computer interface constructs the vaulting transaction, it hands it off to the vault wallet to be signed.
 
-`message FinalizeVaultResponse {
+```message FinalizeVaultResponse {
     bool isDeleted = 1;
     string txid = 2;
-}`
+}
+```
 The vault wallet will then respond with the `txid` of the newly created pre-signed transaction, along with confirmation that the private key is deleted. The **covenant** is officially created and enforced on these coins in the form of the pre-signed transaction. 
 There are considerations on where to store the pre-signed transaction, but for now, they will be stored in a filesystem on the vault wallet.
 
-`message UnvaultRequest{
+```message UnvaultRequest{
     string txid = 1;
-}`
+}
+```
 Upon a unvault request, the computer interface will send a message to the vault wallet containing the txid of the desired pre-signed transaction.
 
-`message UnvaultResponse{
+```message UnvaultResponse{
     string hex = 1;
-}`
+}
+```
 Needless to say, the vault wallet will respond with the pre-signed hex corresponding to `txid` recieved before.
 
 ## Installing
@@ -69,22 +77,22 @@ Will be updated with future releases.
 ## Debugging
 Will be updated with future releases.
 
-## Roadmap/Future Plans
+# Roadmap/Future Plans
 In no particular order:
 
-###Watch Tower###
-    An implementation of a watch tower is necessary for this vault design to function. In its simplest form, a watch tower will notify the wallet owner of a theft attempt so he/she is able to recover funds before the timelock expires.
+### Watch Tower ###
+An implementation of a watch tower is necessary for this vault design to function. In its simplest form, a watch tower will notify the wallet owner of a theft attempt so he/she is able to recover funds before the timelock expires.
 
-###Rust/C Implementation###
-    For prototyping reasons, the language of choice was Python. However, in a production-level use case, Python may not be the best choice due to a whole laundry list of potential reasons. As a result, a C/Rust implementation will likely be on the roadmap as the project matures.
+### Rust/C Implementation ###
+For prototyping reasons, the language of choice was Python. However, in a production-level use case, Python may not be the best choice due to a whole laundry list of potential reasons. As a result, a C/Rust implementation will likely be on the roadmap as the project matures.
 
-###Code Review###
-    Nobody wants to lose their coins due to a software issue. Thus, this project (and projects like this) are going to require extensive code review and optimization to ensure that funds are not lost.
+### Code Review ###
+Nobody wants to lose their coins due to a software issue. Thus, this project (and projects like this) are going to require extensive code review and optimization to ensure that funds are not lost.
 
-###Proposed OpCode-based Covenant mechanisms###
-    Although slow but surely, Bitcoin is an ever changing codebase. New features will be added in the future that will expand Bitcoin's scripting functionalities. This likely will include expanding Bitcoin's ability to create/enforce covenants. We are not only aware of such mecahnisms, but actively evaluating them as well. 
-    It is likely that we will one day see a better covenant mechanism than deleted keys, and if so, we will likely explore converting our design to fit such a mechanism.
-    If interested, one such mechanism we are actively researching is Jeremy Rubin's bip119 OP_CheckTemplateVerify design [5].
+### Proposed OpCode-based Covenant mechanisms ###
+Although slow but surely, Bitcoin is an ever changing codebase. New features will be added in the future that will expand Bitcoin's scripting functionalities. This likely will include expanding Bitcoin's ability to create/enforce covenants. We are not only aware of such mecahnisms, but actively evaluating them as well. 
+It is likely that we will one day see a better covenant mechanism than deleted keys, and if so, we will likely explore converting our design to fit such a mechanism.
+If interested, one such mechanism we are actively researching is Jeremy Rubin's bip119 OP_CheckTemplateVerify design [5].
 
 ## Other Implementations
 There is a sizeable amount of related work.
