@@ -34,7 +34,8 @@ message PrepareVault {
 
 The first message in the vaulting process. The computer interface will send this message to the vault wallet to tell it to initiate the vaulting procedure. 
 
-```message PrepareVaultResponse {
+```
+message PrepareVaultResponse {
     string address = 1;
     string redeemScript = 2;
     string sig(signThis) = 3;
@@ -42,13 +43,15 @@ The first message in the vaulting process. The computer interface will send this
 ```
 After receiving the `PrepareVault` message, the vault wallet will generate a private key and its corresponding redeemScript for the upcoming transaction. Additionally, the vault wallet will sign `signThis` and return its signature for the possibility of authenticated messages. 
 
-```message FinalizeVault {
+```
+message FinalizeVault {
     string hex = 1;
 }
 ```
 After the computer interface constructs the vaulting transaction, it hands it off to the vault wallet to be signed.
 
-```message FinalizeVaultResponse {
+```
+message FinalizeVaultResponse {
     bool isDeleted = 1;
     string txid = 2;
 }
@@ -56,13 +59,15 @@ After the computer interface constructs the vaulting transaction, it hands it of
 The vault wallet will then respond with the `txid` of the newly created pre-signed transaction, along with confirmation that the private key is deleted. The **covenant** is officially created and enforced on these coins in the form of the pre-signed transaction. 
 There are considerations on where to store the pre-signed transaction, but for now, they will be stored in a filesystem on the vault wallet.
 
-```message UnvaultRequest{
+```
+message UnvaultRequest{
     string txid = 1;
 }
 ```
 Upon a unvault request, the computer interface will send a message to the vault wallet containing the txid of the desired pre-signed transaction.
 
-```message UnvaultResponse{
+```
+message UnvaultResponse{
     string hex = 1;
 }
 ```
