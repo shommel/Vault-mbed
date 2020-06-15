@@ -1,4 +1,0 @@
-[submodule "nanopb"]
-	path = nanopb
-	url = git@github.com:nanopb/nanopb.git
-	branch = 0.4.0
