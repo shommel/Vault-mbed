@@ -4,3 +4,6 @@ https://github.com/diybitcoinhardware/f469-disco
 
 after installing the firmware, git clone the repo and copy the files to the PYBFLASH/PYBQSPI mount point 
 
+Note:
+if the board is misbehaving, then run the fix_board.sh file.
+It will reload the udev rules and hopefully fix the issues 
