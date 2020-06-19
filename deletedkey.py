@@ -53,3 +53,9 @@ class DeletedKey:
 		return the public key of the generated key 
 		'''
 		return self.key.get_public_key()
+
+	def isDeleted(self):
+		'''
+		bool if private key is deleted
+		'''
+		return self.key == None
