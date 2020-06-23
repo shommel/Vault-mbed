@@ -6,24 +6,37 @@ from bitcoin.transaction import Transaction, TransactionInput, TransactionOutput
 from bitcoin import compact
 from deletedkey import *
 from FileHandler import *
+import json 
 
 pk = DeletedKey() #the deleted private key
 
+def getTxid(tx):
+    return hexlify(hashlib.sha256(tx.serialize()).digest())
+
+def getAmount(tx):
+    amount = 0
+    for out in tx.vout:
+        amount += out.value
+
+    return amount
 def PrepareVault():
     '''
     Prepare Vault response
     will respond with the address of newly generated private key
     alogn with signature of 'signThis'
     '''
-    #data = sd_read(PATH_TO_FILE)
-    #signThis = data.signThis
+    #data = json.loads(read('/sd/PrepareVault.json'))
+    #signThis = data['signThis']
     signThis = 'hello world' #just having a test value 
     pk.generate()
     sig = hexlify(pk.sign(signThis).serialize())
     addr = script.p2pkh(pk.get_pubkey()).address()
 
-    #write(PATh_TO_FILE, [addr, sig])
-    return [addr, sig, hexlify(pk.get_pubkey().serialize())]
+    # res = {}
+    # res['address'] = addr
+    # res['sig'] = sig
+    #write('/sd/PrepareVaultResponse.json, res)
+    return [addr, sig, pk.get_pubkey()]
 
 def FinalizeVault():
     '''
@@ -31,20 +44,36 @@ def FinalizeVault():
     reads the unsigned hex of the P2TST from the SD Card
 
     '''
-    #data = sd_read(PATH_TO_FILE)
-    # unvault_tx = Transaction.parse(unhexlify(data.txn)) 
+    #data = json.loads(read('/sd/FinalizeVault.json'))
+    # unvault_tx = Transaction.parse(unhexlify(data['txn'])) 
     # h = unvault_tx.sighash_legacy(0, script.p2pkh(pk.get_pubkey()))
     # sig = pk.sign(h)
-    # unvault_tx.vin[i].script_sig = script.script_sig_p2pkh(sig, pk.get_pubkey())
+    # unvault_tx.vin[0].script_sig = script.script_sig_p2pkh(sig, pk.get_pubkey())
 
-    # pk.delete() # delete the private key
-    # isDeleted = pk.key == None
-    # #save_to_filesystem(hexlify(unvault_tx.serialize()))) #saving P2TST to storage on board
+    pk.delete() # delete the private key
+    isDeleted = pk.key == None
+    #txid = getTxid(unvault_tx)
+    #PATH = '/flash/transactions/' + str(txid)
+    #write(PATH, hexlify(unvault_tx.serialize()))) #saving P2TST to storage on board
     
     # #writing if key is deleted and the txid of P2TST
-    # #write(PATH, [isDeleted, hexlify(unvault_tx.txid())]
-    # return [isDeleted, hexlify(unvault_tx.txid())]
-    return 0
+    #res = {}
+    #res['isDeleted'] = isDeleted
+    #res['txid'] = txid
+    #PATH = '/sd/' + 'FinalizeVaultResponse.json'
+    # #write(PATH, res)
+    return isDeleted
 
 def Unvault():
+    # txid_list = json.loads(read('/sd/FinalizeVault.json'))['txids']
+    # res = {}
+    # for txid in txid_list:
+    #     res[txid] = read('/flash/transactions/' + str(txid))
+    #PATH = '/sd/' + 'UnvaultResponse.json'
+    #write(PATH, res)
     return 0
+
+def UnvaultRequest():
+    txid_list = json.loads(read('/sd/FinalizeVault.json'))['txids']
+    return txid_list
+

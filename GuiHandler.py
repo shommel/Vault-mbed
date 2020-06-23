@@ -110,7 +110,7 @@ class GUI:
 		label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
 
 		result_label = lv.label(self.scr)
-		result_label.set_text("Result:\tTrue\nKey generated.\nAddress and signed authenticated message written to SDCard.")
+		result_label.set_text("Result:\tSuccess\nKey generated.\nAddress and signed authenticated message written to SDCard.")
 		result_label.align(None, lv.ALIGN.CENTER, 0, -200)
 
 		#setting up labels for the result of Prepare Vault function
@@ -118,13 +118,17 @@ class GUI:
 		addr_label.set_text(str("Address:    " + str(res[0])))
 		addr_label.align(None, lv.ALIGN.CENTER, 0, 0)
 
-		# addr_label = lv.label(self.scr)
-		# addr_label.set_text(str("Signature:    " + str(res[1])))
-		# addr_label.align(None, lv.ALIGN.CENTER, -200, 80)
+		sig_label = lv.label(self.scr)
+		sig_label.set_long_mode(lv.label.LONG.SROLL_CIRC)
+		sig_label.set_width(300)
+		sig_label.set_text(str("Signature:    " + str(res[1]) ))
+		sig_label.align(None, lv.ALIGN.CENTER, 0, 80)
 
-		# addr_label = lv.label(self.scr)
-		# addr_label.set_text(str("Pubkey:\t{}".format(res[2])))
-		# addr_label.align(None, lv.ALIGN.CENTER, 0, 160)
+		pubkey_label = lv.label(self.scr)
+		pubkey_label.set_long_mode(lv.label.LONG.SROLL_CIRC)
+		pubkey_label.set_width(300)
+		pubkey_label.set_text(str("Pubkey:    " + str(res[2]) ))
+		pubkey_label.align(None, lv.ALIGN.CENTER, 0, 160)
 
 		#button to return to the main menu 
 		btn 	= lv.btn(self.scr)
@@ -134,16 +138,22 @@ class GUI:
 		btn.align(None, lv.ALIGN.IN_BOTTOM_MID, 0, 0)
 		btn.set_event_cb(self.mainMenuCb)
 
-	def screenFinalizeVault(self):
+	def screenFinalizeVault(self, res):
 		self.clear()
 
 		label = lv.label(self.scr)
 		label.set_text("Finalize Vault")
 		label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
 
-		result_label = lv.label(self.scr)
-		result_label.set_text("Result: \t True\nKey deleted. P2TST saved.\ntxid written to SDCard.")
-		result_label.align(None, lv.ALIGN.CENTER, 0, 0)
+		if res == True: #key is deleted. display success message
+			result_label = lv.label(self.scr)
+			result_label.set_text("Result: \t Success\nKey deleted. P2TST saved.\ntxid written to SDCard.")
+			result_label.align(None, lv.ALIGN.CENTER, 0, 0)
+
+		else:
+			result_label = lv.label(self.scr)
+			result_label.set_text("Result: \t Error\nKey not deleted.")
+			result_label.align(None, lv.ALIGN.CENTER, 0, 0)
 
 		#button to return to the main menu 
 		btn 	= lv.btn(self.scr)
@@ -162,15 +172,25 @@ class GUI:
 
 		result_label = lv.label(self.scr)
 		result_label.set_text("Please confirm withdraw of the selected P2TSTs below")
-		result_label.align(None, lv.ALIGN.CENTER, 0, 0)
+		result_label.align(None, lv.ALIGN.IN_TOP_MID, 0, 100)
+
+		
 
 		#button to return to the main menu 
 		btn 	= lv.btn(self.scr)
 		label2 = lv.label(btn)
 		label2.set_text("Confirm Unvault")
 		btn.set_width(120)
-		btn.align(None, lv.ALIGN.IN_BOTTOM_MID, 0, 0)
+		btn.align(None, lv.ALIGN.IN_BOTTOM_MID, 100, 0)
 		btn.set_event_cb(self.confirmUnvaultCb)
+
+		#button to return to the main menu 
+		btn2 	= lv.btn(self.scr)
+		label3 = lv.label(btn2)
+		label3.set_text("Cancel Unvault")
+		btn2.set_width(120)
+		btn2.align(None, lv.ALIGN.IN_BOTTOM_MID, -100, 0)
+		btn2.set_event_cb(self.mainMenuCb)
 
 	def screenUnvaultConfirmation(self):
 		self.clear()
@@ -180,7 +200,7 @@ class GUI:
 		label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
 
 		result_label = lv.label(self.scr)
-		result_label.set_text("Result:\tTrue\nSelected P2TSTs written to SDCard.")
+		result_label.set_text("Result:\tSuccess\nSelected P2TSTs written to SDCard.")
 		result_label.align(None, lv.ALIGN.CENTER, 0, 0)
 
 		#button to return to the main menu 
@@ -231,16 +251,17 @@ class GUI:
 	def finalizeVaultCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
 			res = FinalizeVault()
-			self.screenFinalizeVault()
+			self.screenFinalizeVault(res)
 
 	def unvaultRequestCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
-			#FIXME: unvault request stuff
-			self.screenUnvaultRequest()
+			#res = UnvaultRequest()
+			res = ['e65ad475a01384b086ce0d04199835fdd580739422ece1e0f1c4e362d43735d9', '486c887f2378feb1ea3cdc054cb7b6722e632ab1edac962a00723ea0240f2e9c', 'f51e6fc2392558a70ae970e93538f368828ad2800a7370f372a652de463429fc']
+			self.screenUnvaultRequest(res)
 
 	def confirmUnvaultCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
-			#FIXME: unvault confirmation stuff
+			res = Unvault()
 			self.screenUnvaultConfirmation()
 
 	def listTxsCb(self, obj, event):
