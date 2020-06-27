@@ -4,6 +4,7 @@ import display
 from FileHandler import *
 from deletedkey import *
 from TransactionHandler import *
+from MessageHandler import *
 
 class GUI:
 	'''
@@ -33,18 +34,33 @@ class GUI:
 		
 		#welcome text at top of screen
 		welcome_label = lv.label(self.scr)
-		welcome_label.set_text("Welcome to Encumbered Cold Storage")
+		welcome_label.set_text("Welcome to Encumbered Cold Storage2")
 		welcome_label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
 
-		#detect SD button
+		#Prepare Vault button
 		btn1 	= lv.btn(self.scr)
 		label1 = lv.label(btn1)
-		label1.set_text("Detect SD")
+		label1.set_text("Read Serial Port")
 		btn1.set_width(120)
 		btn1.set_x(180)
-		btn1.set_y(120)
-		btn1.set_event_cb(self.detectSDCb)
+		btn1.set_y(220)
+		btn1.set_event_cb(self.readSerialCb)
 
+	def readSerialCb(self, obj, event):
+		if event == lv.EVENT.CLICKED:
+			read_data()
+
+		# #List P2TSTs button
+		# btn5 	= lv.btn(self.scr)
+		# label5 = lv.label(btn5)
+		# label5.set_text("List P2TSTs")
+		# btn5.set_width(120)
+		# btn5.set_x(180)
+		# btn5.set_y(520)
+		# btn5.set_event_cb(self.listTxsCb)
+
+
+'''
 		#Prepare Vault button
 		btn2 	= lv.btn(self.scr)
 		label2 = lv.label(btn2)
@@ -80,27 +96,6 @@ class GUI:
 		btn5.set_x(180)
 		btn5.set_y(520)
 		btn5.set_event_cb(self.listTxsCb)
-
-	def screenDetectSD(self, res):
-		self.clear()
-
-		label = lv.label(self.scr)
-		label.set_text("Detecting SD")
-		label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
-
-		#the label if the SDCard is present or not
-		result_label = lv.label(self.scr)
-		result_label.set_text("Result:    " + str(res))
-		result_label.align(None, lv.ALIGN.CENTER, 0, 0)
-
-
-		#button to return to the main menu 
-		btn 	= lv.btn(self.scr)
-		label2 = lv.label(btn)
-		label2.set_text("Return to menu")
-		btn.set_width(120)
-		btn.align(None, lv.ALIGN.IN_BOTTOM_MID, 0, 0)
-		btn.set_event_cb(self.mainMenuCb)
 
 	def screenPrepareVault(self, res):
 		self.clear()
@@ -230,18 +225,13 @@ class GUI:
 		btn.align(None, lv.ALIGN.IN_BOTTOM_MID, 0, 0)
 		btn.set_event_cb(self.mainMenuCb)
 
-	'''
+
 	Callback Functions
-	'''
+
 
 	def mainMenuCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
 			self.screenMainMenu()
-
-	def detectSDCb(self, obj, event):
-		if event == lv.EVENT.CLICKED:
-			res = isSDPresent()
-			self.screenDetectSD(res)
 
 	def prepareVaultCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
@@ -256,8 +246,7 @@ class GUI:
 	def unvaultRequestCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
 			#res = UnvaultRequest()
-			res = ['e65ad475a01384b086ce0d04199835fdd580739422ece1e0f1c4e362d43735d9', '486c887f2378feb1ea3cdc054cb7b6722e632ab1edac962a00723ea0240f2e9c', 'f51e6fc2392558a70ae970e93538f368828ad2800a7370f372a652de463429fc']
-			self.screenUnvaultRequest(res)
+			self.screenUnvaultRequest()
 
 	def confirmUnvaultCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
@@ -268,3 +257,4 @@ class GUI:
 		if event == lv.EVENT.CLICKED:
 			#FIXME: list p2tst stuff
 			self.screenListTxs()
+'''

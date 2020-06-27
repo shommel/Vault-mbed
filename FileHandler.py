@@ -1,25 +1,9 @@
-from pyb import SDCard
 from os import listdir, mkdir
-
-def refreshSD():
-	return SDCard()
-
-def isSDPresent():
-	'''
-	bool value if sd card is present or not
-	'''
-
-	#refreshing sd card object 
-	sd = refreshSD()
-	return sd.present()
 
 def read(path, mode='r'):
 	'''
-	reads file on flash or sd card and returns blob of data
+	reads file on flash returns blob of data
 	'''
-	#refreshing sd card object if need be 
-	if 'sd' in path.lower().split('/'):
-		sd = refreshSD()
 
 	fi = open(path, mode)
 	data = fi.read()
@@ -30,11 +14,8 @@ def read(path, mode='r'):
 
 def write(path, data, mode='w'):
 	'''
-	writes to file on flash or sd card and returns number of bytes written
+	writes to file on flash returns number of bytes written
 	'''
-	#refreshing sd card object if need be
-	if 'sd' in path.lower().split('/'):
-		sd = refreshSD()
 
 	fo = open(path, mode)
 	res = fo.write(data)
