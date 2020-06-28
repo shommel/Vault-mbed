@@ -47,7 +47,7 @@ def FinalizeVaultResponse(msg):
 
     pk.delete() # delete the private key
     isDeleted = pk.key == None
-    txid = getTxid(unvault_tx)
+    txid = getTxid(unvault_tx).decode('utf8') #changing from bytes to string
 
     PATH = '/flash/transactions/' + str(txid)
     write(PATH, hexlify(unvault_tx.serialize())) #saving P2TST to storage on board

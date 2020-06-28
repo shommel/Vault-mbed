@@ -16,10 +16,11 @@ import time
 
 CONSTANT	= '___' #divider between msg id and message
 MSG_DIVIDER	= '##?' #divider between parts of the data
+BUFFER_LEN	= 2048 #size of board's read buffer
 	
 #setting up UART comms
 uart = UART(3, 9600)
-uart.init(9600, bits=8, parity=None, stop=1)
+uart.init(9600, bits=8, parity=None, stop=1, read_buf_len=BUFFER_LEN)
 
 def serializeField(data):
 	if isinstance(data, bytes):
@@ -33,20 +34,7 @@ def serializeField(data):
 		return False
 
 def read_data():
-	buffer = b''
-	buffer += uart.read()
-	print("Initial buffer:\t", buffer)
-	while(buffer[-1] != b'$'[0]): # '$' will signify the end of total message
-		print('message longer than 64 bytes. ')
-		data = uart.read()
-		if type(data) != type(None):
-			print("adding to buffer")
-			buffer += data
-		time.sleep_ms(200)
-
-	buffer = buffer[0:-1]
-	print("Fully Received message:\t", buffer)
-	unpack_data(buffer)
+	unpack_data(uart.read())
 
 def send_data(buffer):
 	uart.write(buffer)
