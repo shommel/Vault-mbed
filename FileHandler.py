@@ -1,4 +1,6 @@
-from os import listdir, mkdir
+from os import listdir, mkdir, remove
+
+P2TST_PATH = '/flash/transactions/'
 
 def read(path, mode='r'):
 	'''
@@ -34,3 +36,11 @@ def initTxnDir():
 		return 1
 
 	return 0
+
+def cleanP2tstDir():
+	'''
+	FIXME: used ONLY for testing purposes
+	running this in production will delete funds...
+	'''
+	for fi in listdir(P2TST_PATH[:-1]):
+		remove(P2TST_PATH+fi)

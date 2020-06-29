@@ -44,13 +44,13 @@ def unpack_data(buffer):
 	msgId = int.from_bytes(bytes(decoded_msg[0], 'utf8'), 'big') #decode the msgId
 
 	if(msgId == 0):
-		PrepareVault_handler(decoded_msg[1])
+		PrepareVault_handler(decoded_msg[1].split(MSG_DIVIDER))
 
 	elif(msgId == 2):
-		FinalizeVault_handler(decoded_msg[1])
+		FinalizeVault_handler(decoded_msg[1].split(MSG_DIVIDER))
 
 	elif(msgId == 4):
-		Unvault_handler(decoded_msg[1])
+		Unvault_handler(decoded_msg[1].split(MSG_DIVIDER))
 	else:
 		print("unidentified msg id")
 		return 1
@@ -68,15 +68,17 @@ def pack_data(msg, msgId):
 	send_data(buffer)
 
 def PrepareVault_handler(msg):
-	res = PrepareVaultResponse(msg)
+	signThis = msg[0]
+	res = PrepareVaultResponse(signThis)
 	pack_data(res, 1)
 
 def FinalizeVault_handler(msg):
-	res = FinalizeVaultResponse(msg)
-	print('here')
+	tx = msg[0]
+	res = FinalizeVaultResponse(tx)
 	pack_data(res, 3)
 
 def Unvault_handler(msg):
 	res = UnvaultResponse(msg)
 	pack_data(res, 5)
+
 

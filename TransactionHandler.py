@@ -7,11 +7,26 @@ from bitcoin.transaction import Transaction, TransactionInput, TransactionOutput
 from bitcoin import compact
 from deletedkey import *
 from FileHandler import *
+from os import remove
 
 pk = DeletedKey() #the deleted private key
 
+def swapEndian(h):
+    '''
+    swaps endian of h and hexlifys it
+    '''
+    data = b''
+    for byte in reversed(h):
+        data+=bytes([byte])
+
+    return hexlify(data)
+
 def getTxid(tx):
-    return hexlify(hashlib.sha256(tx.serialize()).digest())
+    '''
+    bit of a hacky way to generate txid
+    micropython does not support [::-1], so we need to call reversed to swap endian
+    '''
+    return swapEndian( hashlib.sha256(hashlib.sha256(tx.serialize()).digest()).digest() ) 
 
 def getAmount(tx):
     amount = 0
@@ -37,7 +52,7 @@ def FinalizeVaultResponse(msg):
     '''
     Finalize Vault response
     reads the unsigned hex of the P2TST, signs and saves it. 
-    then sends back the txid of the p2tst to computer
+    then sends back the txid and value of p2tst to computer
 
     '''
     unvault_tx = Transaction.parse(unhexlify(msg)) 
@@ -52,11 +67,16 @@ def FinalizeVaultResponse(msg):
     PATH = '/flash/transactions/' + str(txid)
     write(PATH, hexlify(unvault_tx.serialize())) #saving P2TST to storage on board
     
-    return [isDeleted, txid]
+    return [isDeleted, txid, str(getAmount(unvault_tx)/1e8)]
 
 def UnvaultResponse(msg):
     res = []
     for txid in msg:
         res.append(read('/flash/transactions/' + str(txid)))
 
+        #FIXME: don't want to delete the file until 
+            #the txns are broadcasted
+        #remove('/flash/transactions/' + str(txid))
+
     return res
+
