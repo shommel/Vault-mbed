@@ -10,7 +10,7 @@ from FileHandler import *
 from os import remove
 
 pk = DeletedKey() #the deleted private key
-
+network = NETWORKS['regtest']
 def swapEndian(h):
     '''
     swaps endian of h and hexlifys it
@@ -44,7 +44,7 @@ def PrepareVaultResponse(msg):
     signThis = msg 
     pk.generate()
     sig = hexlify(pk.sign(signThis).serialize())
-    addr = script.p2pkh(pk.get_pubkey()).address()
+    addr = script.p2pkh(pk.get_pubkey()).address(network)
     
     return [addr, sig]
 

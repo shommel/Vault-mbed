@@ -34,7 +34,7 @@ class GUI:
 		
 		#welcome text at top of screen
 		welcome_label = lv.label(self.scr)
-		welcome_label.set_text("Welcome to Encumbered Cold Storage2")
+		welcome_label.set_text("Welcome to Encumbered Cold Storage")
 		welcome_label.align(None, lv.ALIGN.IN_TOP_MID, 0, 30)
 
 		#Prepare Vault button
