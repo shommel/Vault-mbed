@@ -43,8 +43,8 @@ class DeletedKey:
 		
 		return a signature object 
 		'''
-		if(len(msg) != 32): #a message of arbitrary length (i.e not part of a transaction)
-			return self.key.sign(hashlib.sha256(msg).digest())
+		# if(len(msg) != 32): #a message of arbitrary length (i.e not part of a transaction)
+		# 	return self.key.sign(hashlib.sha256(msg).digest())
 
 		return self.key.sign(msg)
 

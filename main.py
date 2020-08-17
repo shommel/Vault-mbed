@@ -1,10 +1,33 @@
-from GuiHandler import *
-from FileHandler import initTxnDir
+from guiHandler import *
+from fileHandler import initTxnDir, cleanP2tstDir
+import uasyncio
 
-#initializing transactions dir if it does not already exist
-initTxnDir()
+TESTING = True
 
-#initializes gui object and the 'main menu'
-gui = GUI() 
-gui.screenMainMenu()
+async def loop():
+    while True:
+        if isUSBReadyToRead():
+            pyb.LED(2).toggle() #showing that there is data in the comms port
+            result = read_data()
 
+            if result == 0:
+                pyb.LED(3).toggle()
+                print('error handling. something wrong with reading')
+
+        await uasyncio.sleep_ms(100)
+
+def main():
+    #init ializing transactions dir if it does not already exist
+    initTxnDir()
+
+    if TESTING:
+        #if testing, clean the dev board at each restart of board
+        cleanP2tstDir()
+
+    #initializes gui object and the 'main menu'
+    gui = GUI() 
+    gui.screenMainMenu()
+    uasyncio.run(loop())
+
+if __name__ == '__main__':
+    main()

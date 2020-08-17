@@ -37,6 +37,9 @@ def initTxnDir():
 
 	return 0
 
+def deleteTransaction(txid):
+	remove(P2TST_PATH+txid)
+
 def cleanP2tstDir():
 	'''
 	FIXME: used ONLY for testing purposes

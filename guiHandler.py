@@ -1,10 +1,10 @@
 import lvgl as lv
 import pyb
 import display
-from FileHandler import *
-from deletedkey import *
-from TransactionHandler import *
-from MessageHandler import *
+from fileHandler import *
+from deletedKey import *
+from transactionHandler import *
+from messageHandler import *
 
 class GUI:
 	'''
@@ -40,15 +40,15 @@ class GUI:
 		#Prepare Vault button
 		btn1 	= lv.btn(self.scr)
 		label1 = lv.label(btn1)
-		label1.set_text("Read Serial Port")
+		label1.set_text("Test LED")
 		btn1.set_width(120)
 		btn1.set_x(180)
 		btn1.set_y(220)
-		btn1.set_event_cb(self.readSerialCb)
+		btn1.set_event_cb(self.testLEDCb)
 
-	def readSerialCb(self, obj, event):
+	def testLEDCb(self, obj, event):
 		if event == lv.EVENT.CLICKED:
-			read_data()
+			pyb.LED(4).toggle()
 
 		# #List P2TSTs button
 		# btn5 	= lv.btn(self.scr)
