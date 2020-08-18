@@ -38,6 +38,9 @@ def initTxnDir():
 	return 0
 
 def deleteTransaction(txid):
+	'''
+	delete a given transaction on the board
+	'''
 	remove(P2TST_PATH+txid)
 
 def cleanP2tstDir():

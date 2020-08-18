@@ -10,7 +10,7 @@ ADC_ops = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"]
 
 class DeletedKey:
 	'''
-	acting as an interface for the PrivateKey class in ec.py. 
+	an interface to work with a PrivateKey from ec.py to soon be deleted 
 	'''
 	def __init__(self, key=None):
 		self.key = key
@@ -20,9 +20,14 @@ class DeletedKey:
 		generating entropy and initializing private key 
 		entropy both from RNG chip and analog-to-digital converters on board
 		'''
-		entropy = urandom(32) + b'dfahdsfjhsadkfjhsdljkhmndfb'
+
+		#creating entropy for private key
+		entropy = urandom(32) + b'lsoeitgmmcnxgwt364495p5,5m5b4g3y344k3jhuri99'
 		ADC_entropy = bytes([ADC(choice(ADC_ops)).read() % 256 for i in range(2048)])
 		self.key = ec.PrivateKey.parse(hashlib.sha256(entropy + ADC_entropy).digest())
+		
+		#garbage collection to ensure the secrets are not in memory
+		#FIXME: transition the private key to a bytearray for direct memory access
 		del entropy
 		del ADC_entropy
 		collect()
@@ -43,9 +48,6 @@ class DeletedKey:
 		
 		return a signature object 
 		'''
-		# if(len(msg) != 32): #a message of arbitrary length (i.e not part of a transaction)
-		# 	return self.key.sign(hashlib.sha256(msg).digest())
-
 		return self.key.sign(msg)
 
 	def get_pubkey(self):

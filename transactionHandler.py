@@ -65,27 +65,33 @@ def finalizeVaultResponse(msg):
     sig = pk.sign(h)
     unvault_tx.vin[0].script_sig = script.script_sig_p2pkh(sig, pk.get_pubkey())
 
-    pk.delete() # delete the private key
+    # delete the private key, covenant is live!
+    pk.delete() 
     isDeleted = pk.key == None
     txid = getTxid(unvault_tx).decode('utf8') #changing from bytes to string
 
+    #saving P2TST to storage on board
     PATH = '/flash/transactions/' + str(txid)
-    write(PATH, hexlify(unvault_tx.serialize())) #saving P2TST to storage on board
+    write(PATH, hexlify(unvault_tx.serialize())) 
     
     return [isDeleted, txid, str(getAmount(unvault_tx)/1e8)]
 
 def unvaultResponse(msg):
+    '''
+    will retrieve the presigned transactions corresponding to list of txids sent by computer
+    '''
+
     res = []
     for txid in msg:
         res.append(read('/flash/transactions/' + str(txid)))
 
-        #FIXME: don't want to delete the file until 
-            #the txns are broadcasted
-        #remove('/flash/transactions/' + str(txid))
-
     return res
 
 def confirmDelete(msg):
+    '''
+    once the p2tsts are unvaulted, we can delete their hexes from the board
+    '''
+
     for txid in msg:
         deleteTransaction(txid)
 

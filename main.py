@@ -7,7 +7,6 @@ TESTING = True
 async def loop():
     while True:
         if isUSBReadyToRead():
-            pyb.LED(2).toggle() #showing that there is data in the comms port
             result = read_data()
 
             if result == 0:
